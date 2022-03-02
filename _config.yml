@@ -2,7 +2,7 @@
 title: Prateek Raikar
 SEOTitle: Explore the space
 description: Tinker the things
-keyword: "jekyll, theme, blog, blog theme"
+keyword: "Space , tinker, future"
 url: "https://seeker316.github.io"      # your host, for absolute URL
 baseurl: ""                                         # for example, '/blog' if your blog hosted on 'host/blog'
 avatar: "img/header-avatar.jpeg"                    # the avatar showing on the homepage
@@ -54,12 +54,12 @@ collections:
 # SNS settings
 sns:
   RSS: true
-  github_username: Renovamen
-  weibo_username:
-  zhihu_username: chao-neng-gui-su
-  twitter_username: renovamen_zxh
-  facebook_username: renovamen.zou
-  linkedin_username: xiaohan-zou-55bba0160
+  github_username: seeker316
+ # weibo_username:
+ # zhihu_username: chao-neng-gui-su
+  twitter_username: 
+ # facebook_username: renovamen.zou
+ # linkedin_username: xiaohan-zou-55bba0160
   email_address: prateek811raikar@gmail.com
 
 
