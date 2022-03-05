@@ -2,7 +2,7 @@
 layout: post
 header-style: text
 title: Just project
-img: img/projects/test1.png
+img: img/workshop1.jpg
 ---
 
 # EDM playlist
