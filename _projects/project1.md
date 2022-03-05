@@ -1,7 +1,7 @@
 ---
 layout: post
 header-style: text
-title: EDM
+title: Just project
 img: img/projects/test1.png
 ---
 
