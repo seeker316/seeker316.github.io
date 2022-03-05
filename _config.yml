@@ -103,21 +103,21 @@ menus:
   - title: Home
     font: fab fa-fort-awesome
     url: /
-  - title: About
-    font: fas fa-paw
-    submenus:
-      - title: Me
-        font: fas fa-user-astronaut
-        url: /about/
-      - title: Music
-        font: fas fa-music
-        url: /music/
+#   - title: About
+#     font: fas fa-paw
+#     submenus:
+    - title: Me
+      font: fas fa-user-astronaut
+      url: /about/
+    - title: Music
+      font: fas fa-music
+      url: /music/
 #       - title: Theme
 #         font: fas fa-meteor
 #         url: /theme/
-  - title: Archive
-    font: fas fa-archive
-    url: /archive/
+#   - title: Archive
+#     font: fas fa-archive
+#     url: /archive/
   - title: Links
     font: fas fa-link
     url: /links/
