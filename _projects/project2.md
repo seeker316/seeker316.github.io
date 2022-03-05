@@ -1,7 +1,7 @@
 ---
 layout: post
 header-style: text
-title: Heavy Metal
+title: Project2
 img: img/projects/test1.png
 ---
 
