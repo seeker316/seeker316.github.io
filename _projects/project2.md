@@ -2,7 +2,7 @@
 layout: post
 header-style: text
 title: Project2
-img: img/projects/test1.png
+img: img/workshop2.jpeg
 ---
 
 
