@@ -112,6 +112,9 @@ menus:
   - title: Music
     font: fas fa-music
     url: /music/
+  - title: Inventory
+    font: fas fa-book
+    url: /inventory/
 #       - title: Theme
 #         font: fas fa-meteor
 #         url: /theme/
