@@ -115,6 +115,9 @@ menus:
   - title: Inventory
     font: fas fa-book
     url: /inventory/
+  - title: Projects
+    font: fas fa-rocket
+    url: /projects/
 #       - title: Theme
 #         font: fas fa-meteor
 #         url: /theme/
