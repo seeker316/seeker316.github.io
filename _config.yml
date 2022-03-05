@@ -106,12 +106,12 @@ menus:
 #   - title: About
 #     font: fas fa-paw
 #     submenus:
-    - title: Me
-      font: fas fa-user-astronaut
-      url: /about/
-    - title: Music
-      font: fas fa-music
-      url: /music/
+  - title: Me
+    font: fas fa-user-astronaut
+    url: /about/
+  - title: Music
+    font: fas fa-music
+    url: /music/
 #       - title: Theme
 #         font: fas fa-meteor
 #         url: /theme/
