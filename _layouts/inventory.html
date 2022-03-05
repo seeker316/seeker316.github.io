@@ -9,7 +9,7 @@ layout: default
 {%- assign _assets_baseurl = __return -%}
 
 <div class="portfolio container">
-  {% for proj in "_projects/" %}
+  {% for proj in _projects %}
   <article class="item">
     {% if proj.img %}
     <a
