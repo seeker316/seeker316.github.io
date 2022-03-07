@@ -1,4 +1,4 @@
-<!-- {%- include utils/get-assets-baseurl.html -%}
+{%- include utils/get-assets-baseurl.html -%}
 {%- assign _assets_baseurl = __return -%}
 
 <div class="section work-experience">
@@ -21,15 +21,15 @@
               <p class="job-description">{{ exp.content }}</p>
             </div>
           </div>
-        </li>
+<!--         </li>
         {% endfor %}
 
-<!--         <li class="timeline-inverted">
+        <li class="timeline-inverted">
           <div class="timeline-image">
             <img class="img-circle img-responsive" src="{{ _assets_baseurl }}/{{ page.avatar }}">
           </div>
         </li> -->
-<!--       </ul>
+      </ul>
     </div>
   </div>
 </div>
@@ -44,6 +44,6 @@
   sr.reveal(".timeline-image", {
     duration: 500,
     distance: "80px"
-  }); -->
-<!-- </script>
- -->
+  });
+</script>
+
