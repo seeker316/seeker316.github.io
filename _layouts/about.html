@@ -4,11 +4,11 @@ layout: default
 
 <div class="about-page">
   <!-- the blank is used to replace intro-header -->
-  <div class="about-blank"></div>
+<!--   <div class="about-blank"></div> -->
 
   {% include about/header.html %}
-
-  <!--
+<!-- 
+  
   {% if site.publications.size > 0 %}
     {% include about/publications.html %}
   {% endif %}
@@ -25,6 +25,6 @@ layout: default
     <div class="post-container">
       {% capture about_other %}{% include about/md/other.md %}{% endcapture %}
       {{ about_other | markdownify }}
-    </div> -->
-<!--   </div> -->
+    </div>
+  </div> -->
 </div>
