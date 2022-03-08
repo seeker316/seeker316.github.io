@@ -2,7 +2,7 @@
 layout: post
 title: Hola World
 subtitle: Welcome to my blog
-header-img: img/in-post/2020-10-07/header.jpg
+header-img: img/blog1_cover.jpg
 header-style: text
 ---
 
