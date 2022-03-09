@@ -8,7 +8,7 @@ header-style: text
 
 Welcome to my blog page…a small portal to my enchanted land. Here I am going to keep all my crazy Ideas and interests.     
 
-And about me I'm a music-o-holic. metal, Hard rock, Punk rock, hip hop, EDM just name it [(_I have a dope collection of great songs_)](https://seeker316.github.io/music/). I spend most of my time wandering in my own world (like a Cloud Walker). As a kid I dreamt of becoming someone like *IRON MAN* not just a superhero but more of a genius inventor. I am trying to work my way up there, taking my time on my ride.
+And about me I'm a music-o-holic. metal, Hard rock, Punk rock, hip hop, EDM just name it [(_Check out my playlists_)](https://seeker316.github.io/music/). I spend most of my time wandering in my own world (like a Cloud Walker). As a kid I dreamt of becoming someone like *IRON MAN* not just a superhero but more of a genius inventor. I am trying to work my way up there, taking my time on my ride.
 
 ![blog1 image](/img/blog1_cover.jpg)
 
