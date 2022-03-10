@@ -3,7 +3,6 @@ layout: post
 title: Hola World
 subtitle: Welcome to my blog
 header-img: img/blog1_cover.jpg
-header-style: text
 ---
 
 Welcome to my blog page…a small portal to my enchanted land. Here I am going to keep all my crazy Ideas and interests.     
