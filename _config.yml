@@ -53,7 +53,7 @@ collections:
 
 # SNS settings
 sns:
-  RSS: true
+#   RSS: true
   github_username: seeker316
  # weibo_username:
  # zhihu_username: chao-neng-gui-su
