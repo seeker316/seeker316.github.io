@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Project3
-header-style: image
+header-style: text
 img: img/workshop3.jpg
 ---
 
