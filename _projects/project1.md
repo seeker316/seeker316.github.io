@@ -1,7 +1,7 @@
 ---
 layout: post
-title: project1
-img: img/workshop1.jpg
+title: 6502 emulation
+img: img/projects/6502-cover.jpg
 header-style: text
 ---
 
