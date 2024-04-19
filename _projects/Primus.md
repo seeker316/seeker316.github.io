@@ -6,7 +6,7 @@ img: img/workshop2.jpeg](https://github.com/seeker316/Primus/blob/main/images/ca
 ---
 
 
-# Castor Jr.
+# PRIMUS
 
 Hello everyone...wanted to document a robot I made recently. I had some free time and Omni wheels lying around (I'll explain what they are later), so I created a bot. There are two more robots I want to document. It was a team effort, and we are currently working on a third one. This one is a personal side quest called "**PRIMUS**". My motivation to build this bot comes from my interest in swarm robotics. I'm intrigued by the concept of a coordinated swarm of robots working together, much like the powerful force of ants or bees when they swarm, despite their small size. The name "Primus" means the first; it's the first of many to come and follow. Currently, I haven't settled on a specific swarm application. The objective is to create a robot that can be easily modified and replicated for various swarm applications in the future.
 
