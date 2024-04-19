@@ -1,8 +1,8 @@
 ---
 layout: post
 header-style: text
-title: PRIMUS
-img: img/BlogPrimus/images/blog1/cover1.png
+title: PRIMUS BLOG-I
+img: img/BlogPrimus/images/blog1/thumb1.jpeg
 ---
 
 
@@ -24,23 +24,23 @@ ________________________________________________________________________________
 | Turn Right        | ++                | -                 | Right Turn (Pivot)             |
 ----------------------------------------------------------------------------------------------
 
- ![Differential drive train](/img/Blog2_RX782/legsfinal2.jpg)
+ ![Differential drive train](/img/BlogPrimus/images/blog1/diffdrive.png)
  
 In a differential drive system, the robot cannot move directly sideways; it requires a combination of forward and rotational movements to achieve lateral motion. For instance, for a tank-like robot to move forward in a different direction, it must first rotate in that direction and then proceed to move forward along that path.
 
 The holonomic drive uses wheels or rollers that can move independently in multiple directions, allowing a robot to move in any direction without changing its orientation. It can be further categorized into omni drives and mecanum drives depending on the type of wheel the drive uses. The ones I've used are omni-wheels.
 
- ![image of omni wheel and mecanum wheels](/img/Blog2_RX782/legsfinal2.jpg)
+ ![image of omni wheel and mecanum wheels](/img/BlogPrimus/images/blog1/wheel_image.png)
 
 I'm relatively new to design work; the only experience I had with CAD was during my 3rd semester at college, and even then, it was just to give it a try. In my team, I don't typically handle the design aspect—I focus on developing the crappy software for the robot. So, working on Primus was my first real foray into the world of design. This project was simpler, but it required some effort as I found myself stuck often between undo and redo. 
 
-omni wheels can be used in 2 configurations, 3-wheel configuration (axes of wheels are separated by 120 degrees) and 4-wheel configuration (axes of wheels are separated by 90 degrees). I decided to go with the 3-wheel configuration, why u ask? Because each wheel costs goddamn 500 bucks! For the robot body, I decided to go with a hexagonal shape with each alternating side extended. Initially, I planned to place the wheels along the longer sides. However, a fellow team member pointed out that placing the wheels along the shorter edges would be more stable and would also free up space underneath the robot's belly. This space could be utilized to place some electronics beneath. I designed the robot using Autodesk Fusion 360. The image below shows the two designs; the left one is the initial design, and the right one is the final one.
+Omni wheels can be used in 2 configurations, 3-wheel configuration (axes of wheels are separated by 120 degrees) and 4-wheel configuration (axes of wheels are separated by 90 degrees). I decided to go with the 3-wheel configuration, why u ask? Because each wheel costs goddamn 500 bucks! For the robot body, I decided to go with a hexagonal shape with each alternating side extended. Initially, I planned to place the wheels along the longer sides. However, a fellow team member pointed out that placing the wheels along the shorter edges would be more stable and would also free up space underneath the robot's belly. This space could be utilized to place some electronics beneath. I designed the robot using Autodesk Fusion 360. The image below shows the two designs; the left one is the initial design, and the right one is the final one.
 [IMAGE OF CAD DESIGN]
 
 The body plates were fabricated from acrylic using laser cutting. The motors are fixed to the lower plate with an L-shaped motor clamp, and the upper covering plate is separated by 35 mm hexagonal metal spacers. Additionally, I 3D printed the motor shaft to omni-wheel couplings using SLA. The image below shows the completed hardware assembly. 
 
 [image of hardware model]
-![Differential drive train](/img/Blog2_RX782/legsfinal2.jpg)
+![Differential drive train](/img/BlogPrimus/images/blog1/thumb1.jpeg)
 
 
 The electronics part is pretty straightforward. Here's the breakdown:
@@ -53,6 +53,6 @@ The electronics part is pretty straightforward. Here's the breakdown:
 The circuit diagram below illustrates how the power is distributed to all the components:
 
 [Circuit diagram]
-![Differential drive train](/img/Blog2_RX782/legsfinal2.jpg)
+![Differential drive train](/img/BlogPrimus/images/blog1/Untitled.png)
 
 In this blog, we've walked through the design, electronics, and hardware of Primus. Next up, we'll explore the mechanics of the 3-omniwheel drive and delve into the code for our web server-based remote control. Stay tuned!
