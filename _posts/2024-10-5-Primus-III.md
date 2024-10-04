@@ -217,12 +217,12 @@ The joystick is styled as a yellow circle that changes appearance on hover and c
 
 - **JavaScript Functionality**:
 A joystick is implemented using the JoyStick function, which captures touch or mouse input and calculates the joystick's position (X, Y) and direction. WebSocket communication is established to send motor values to a server. A function getfuerza() calculates motor speeds based on joystick input using a linear transformation to adapt joystick values to motor speeds for a three-wheeled omniwheel robot. The calculations include specific coefficients to achieve the desired motion, mapping joystick input values to motor commands that correspond to the robot's movement requirements. These points and the derivation behind the math was thoroughtly discussed in the last blog. The joystick is updated every 300 milliseconds to send motor control commands via WebSocket, limiting message frequency to prevent overloading.
-Adding the HTML code in the blog is breaking the page so you if you want to have a look at the code, it is available [here (https://github.com/seeker316/Primus/blob/main/html/Castor_jr_ui.html).
+Adding the HTML code in the blog is breaking the page so you if you want to have a look at the code, it is available [here] (https://github.com/seeker316/Primus/blob/main/html/Castor_jr_ui.html).
 
 In this blog, we've covered the complete code behind running PRIMUS. Over the course of these three blogs, I believe I've provided enough detail for anyone to attempt building their own version of the project. As a side note, I've also migrated the entire project to a Raspberry Pi, adding a camera with pan-tilt control for the robot. However, I’m not planning to cover its code in a blog just yet. I've included a photo of the Raspberry-pi PRIMUS.
  *P.S: Horrible wiring alert!!*
 
-![Primus migrated toa raspberry-pi](/img/BlogPrimus/images/blog3/primus_raspi_Blog3.jpeg)
+![Primus migrated to a raspberry-pi](/img/BlogPrimus/images/blog3/primus_raspi_Blog3.jpeg)
 
 Looking ahead, I plan to release a new series on communication protocols using the ATmega328P. Alternatively, I’m considering starting with an active project that focuses more on embedded software, like a task scheduler.
 
