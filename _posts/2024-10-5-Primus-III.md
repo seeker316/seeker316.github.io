@@ -55,8 +55,8 @@ uint32_t randomColor = NeoPixel.Color(random(256), random(256), random(256));
 ```
 ### Wi-Fi Credentials and Initialization
 ```
-const char* ssid = "********"; //Enter SSID
-const char* password = "********"; //Enter Password
+const char* ssid = "********";
+const char* password = "********";
 
 ```
 ### Initializing WebSocket and HTTP Servers
