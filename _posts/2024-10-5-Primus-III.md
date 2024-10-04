@@ -53,17 +53,15 @@ Now that we've gone through how the communication takes place let's go through t
 Adafruit_NeoPixel NeoPixel(NUM_PIXELS,RGB_PIN, NEO_GRB + NEO_KHZ800);
 uint32_t randomColor = NeoPixel.Color(random(256), random(256), random(256));
 ```
-### Wi-Fi Credentials and Initialization
+### Wi-Fi Credentials and Initializing WebSocket and HTTP Servers
+- **WebsocketsServer**: A WebSocket server instance is created.
+
+- **AsyncWebServer**: An HTTP server instance is created. It listens on port 80 (the default port for HTTP).
+
 ```
 const char* ssid = "********";
 const char* password = "********";
 
-```
-### Initializing WebSocket and HTTP Servers
-- **WebsocketsServer**: A WebSocket server instance is created.
-
-- **AsyncWebServer**: An HTTP server instance is created. It listens on port 80 (the default port for HTTP).
-```
 using namespace websockets;
 WebsocketsServer server;
 AsyncWebServer webserver(80);
