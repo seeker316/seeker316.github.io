@@ -2,7 +2,7 @@
 layout: post
 title: PRIMUS_Blog-II
 subtitle: Omni-drive formulation
-header-img: img/BlogPrimus/images/blog2/thumbnail_Blog2a.jpeg
+header-img: img/BlogPrimus/images/blog2/thumbnail_Blog2.jpeg
 ---
 
 
