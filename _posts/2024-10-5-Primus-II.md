@@ -54,7 +54,7 @@ You can think of it like a light switch that you can turn on and off very quickl
 - if you leave it on for a long time and then turn it off for a short time, it will appear bright. 
 - Conversely, if you turn it on and off very quickly but keep it off for a longer duration, it will appear dim. 
 
-![PWM average output voltage.](img/BlogPrimus/images/blog2/PWM_Blog2.jpg)
+![PWM average output voltage.](/img/BlogPrimus/images/blog2/PWM_Blog2.jpg)
 
 By varying the duration that the flashlight remains on compared to when it is off, you can control its brightness. The average voltage produced through PWM is proportional to the width of the pulses, which is known as the **Duty Cycle**. The Duty cycle is calculated as 
 ```
@@ -62,7 +62,7 @@ Duty_Cycle(%) = ( Time_ON / Time_ON + Time_OFF ) × 100
 ```
 A higher duty cycle results in a higher average voltage applied to the DC motor, leading to an increase in motor speed. Conversely, a shorter duty cycle means a lower average voltage applied to the DC motor, resulting in a decrease in motor speed.
 
-![PMW parameters](img/BlogPrimus/images/blog2/PWM_charBlog2.png)
+![PMW parameters](/img/BlogPrimus/images/blog2/PWM_charBlog2.png)
 
 
 The following code demonstrates an implementation of PWM (Pulse Width Modulation) to control both the speed and direction of a DC motor using an Arduino with an L298 motor driver. By adjusting the duty cycle through the PWM signal, we can gradually increase and decrease the motor's speed while also managing its rotation direction.
@@ -98,7 +98,7 @@ void loop() {
 
 Now, let’s dive into everyone’s favorite topic: MATH! If you’ve seen the formulas mentioned above at least once in your life, trust me, it’s not going to be scary. In our case, we are using a left-hand coordinate system, you can visualize it by extending your left hand, as shown in the picture.
 
-![co-ordinate system photo](img/BlogPrimus/images/blog2/PRIMUS_cordBlog2.png)
+![co-ordinate system photo](/img/BlogPrimus/images/blog2/PRIMUS_cordBlog2.png)
 
 Let’s start with what are degrees of freedom. The degrees of freedom for a system refers to the number of independent parameters or ways it can move. Essentially, it measures how many different directions or types of motion the robot's joints or components can take.
 Consider a door hinge: it has one degree of freedom because it can rotate along a single axis, allowing the door to swing open or closed. Similarly, a ball in three-dimensional space has six degrees of freedom: three translational (movement along the three perpendicular axes: x, y, and z) and three rotational (rotation around each of the three axes).
