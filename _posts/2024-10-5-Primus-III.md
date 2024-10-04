@@ -221,7 +221,8 @@ The joystick is styled as a yellow circle that changes appearance on hover and c
 A joystick is implemented using the JoyStick function, which captures touch or mouse input and calculates the joystick's position (X, Y) and direction. WebSocket communication is established to send motor values to a server. A function getfuerza() calculates motor speeds based on joystick input using a linear transformation to adapt joystick values to motor speeds for a three-wheeled omniwheel robot. The calculations include specific coefficients to achieve the desired motion, mapping joystick input values to motor commands that correspond to the robot's movement requirements. These points and the derivation behind the math was thoroughtly discussed in the last blog. The joystick is updated every 300 milliseconds to send motor control commands via WebSocket, limiting message frequency to prevent overloading.
 
 ```
-<!DOCTYPE html>
+remove # from code
+#<!DOCTYPE html>
 
 <html>
 
