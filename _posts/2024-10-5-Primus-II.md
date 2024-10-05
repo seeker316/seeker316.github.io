@@ -11,7 +11,7 @@ header-img: img/BlogPrimus/images/blog1/thumb2.jpeg
 
 Yo! 
 In the last blog we went through the whole design and hardware part of primus. Now we'll be going through the math behind the drive and some code. To get a proper idea of the math working here you should know some basics of trignometry and matrices also a little vector algebra. This one can be a little difficult to understand. but don't worry we'll go through this together. I've included the necessary formulas below, which we'll use for the derivation.
-```
+```text
 #Trignometric formulae:
 sin(𝜃) = opposite / hypotenuse        
 cos(𝜃) = adjacent / hypotenuse
@@ -66,7 +66,7 @@ A higher duty cycle results in a higher average voltage applied to the DC motor,
 
 
 The following code demonstrates an implementation of PWM (Pulse Width Modulation) to control both the speed and direction of a DC motor using an Arduino with an L298 motor driver. By adjusting the duty cycle through the PWM signal, we can gradually increase and decrease the motor's speed while also managing its rotation direction.
-```
+```cpp
 int pwmPin = 12;          // Pin connected to the PWM signal for motor speed control
 int motorDir1 = 13;      // Pin for the first direction control of the motor
 int motorDir2 = 15;      // Pin for the second direction control of the motor
@@ -119,7 +119,7 @@ Similarly for the y-component,
 
 [rigth angles triangle image]
 To calculate the x and y components of the force, consider a right-angled triangle where the hypotenuse represents the motor's force. Using trigonometric ratios, we can resolve this force into its components.
-```
+```txt
 sinθ = Opp / hyp = y_component / motor_force 
 y_component = motor_force*sinθ
 
@@ -150,7 +150,7 @@ This leaves us with three simultaneous equations:
 The final goal is to control the robot's movement using a joystick. The robot should move in the direction indicated by the joystick. The resultant forces **Fx** and **Fy** represent the vector indicated by the joystick, and we need to use that vector to calculate the motor values **Fm1,Fm2 and Fm3**.
 
 There are two methods to solve these simultaneous equations: algebraically, which is possible but complicated, or using matrix methods, which is much more efficient for larger systems of equations.
-```
+```txt
 Representing the simultaneous equations in matrix form: 
     | Fx |   | 1  -0.5  -0.5  |  | Fm1 |
     | Fy | = | 0  0.86  -0.86 |  | Fm2 |
