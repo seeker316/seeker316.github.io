@@ -35,7 +35,7 @@ Now that we've gone through how the communication takes place let's go through t
 - **Adafruit_NeoPixel.h**: Manages the NeoPixel LED strip
 - **web.h**: custom header file that contains HTML
 
-```
+```cpp
 #include <WiFi.h>
 #include <ArduinoWebsockets.h> 
 #include <ESPAsyncWebServer.h>
@@ -47,7 +47,7 @@ Now that we've gone through how the communication takes place let's go through t
 - **NUM_PIXELS**: The number of LEDs in the strip is 28.
 - **NeoPixel**: An instance of the Adafruit_NeoPixel class is initialized, setting the number of LEDs, the data pin, and the communication protocol.
 - **randomColor**: Generates a random color for use later, by picking random values for the red, green, and blue components (between 0 and 255).
-```
+```cpp
 #define RGB_PIN 15
 #define NUM_PIXELS 28
 Adafruit_NeoPixel NeoPixel(NUM_PIXELS,RGB_PIN, NEO_GRB + NEO_KHZ800);
@@ -58,7 +58,7 @@ uint32_t randomColor = NeoPixel.Color(random(256), random(256), random(256));
 
 - **AsyncWebServer**: An HTTP server instance is created. It listens on port 80 (the default port for HTTP).
 
-```
+```cpp
 const char* ssid = "********";
 const char* password = "********";
 
@@ -81,7 +81,7 @@ AsyncWebServer webserver(80);
 
 - **NeoPixel.setBrightness(50)**: Sets the brightness of the LEDs to 50 (on a scale from 0 to 255).
 
-```
+```cpp
 int M1value, M2value, M3value, commaIndex;
 
 int motor1Pin1 = 14; 
@@ -127,11 +127,11 @@ void setup()
 - **Connecting to Wi-Fi**: The ESP32 is connected to a Wi-Fi network using the credentials provided earlier. It repeatedly checks the connection status and, once connected, prints the local IP address to the serial monitor. This IP address is what you use to access the server from your browser.
 
 - **Setting up the HTTP Server**: The HTTP server is configured to serve the webpage when a user accesses the root URL (/). The server responds with a precompressed HTML file in gzip format. This compressed format helps reduce the file size, making the webpage load faster. This file is served with a *Content-Encoding: gzip header*, so the browser knows to decompress it when displaying the webpage. The gzip file, index_html_gz, is defined in the web.h file as a byte array, like this:
-```
+```c
 const uint8_t index_html_gz[] = { 0x1f, 0x8b, 0x08, ... };
 ```
 - **WebSocket Server Setup**: The WebSocket server is initialized on port 82. This server allows real-time, two-way communication between the browser and the ESP32.
-```
+```cpp
   Serial.begin(9600);
   Serial.print("Connecting to WiFi...");
   WiFi.begin(ssid, password);
@@ -160,7 +160,7 @@ The values are extracted from the message and converted to integers. which is th
 - If positive, the motor moves forward.
 - If negative, the motor moves backward.
 - If zero, the motor stops.
-```
+```cpp
 void handle_message(WebsocketsMessage msg) {
   commaIndex = msg.data().indexOf(',');
   int secondCommaIndex = msg.data().indexOf(',', commaIndex + 1);
@@ -189,7 +189,7 @@ This loop handles the LED states and checks for incoming WebSocket connections, 
 - **Green**: The bot is connected to a user. Once connected, the green color transitions to a randomly generated color as the robot starts moving, reflecting the bot's active state.
 
 Additionally, when a WebSocket client connects, the bot handles motor control based on the incoming messages from the client.
-```
+```cpp
 void loop()
 {
   NeoPixel.clear();
@@ -217,6 +217,7 @@ The joystick is styled as a yellow circle that changes appearance on hover and c
 
 - **JavaScript Functionality**:
 A joystick is implemented using the JoyStick function, which captures touch or mouse input and calculates the joystick's position (X, Y) and direction. WebSocket communication is established to send motor values to a server. A function getfuerza() calculates motor speeds based on joystick input using a linear transformation to adapt joystick values to motor speeds for a three-wheeled omniwheel robot. The calculations include specific coefficients to achieve the desired motion, mapping joystick input values to motor commands that correspond to the robot's movement requirements. These points and the derivation behind the math was thoroughtly discussed in the last blog. The joystick is updated every 300 milliseconds to send motor control commands via WebSocket, limiting message frequency to prevent overloading.
+
 Adding the HTML code in the blog is breaking the page so you if you want to have a look at the code, it is available [here](https://github.com/seeker316/Primus/blob/main/html/Castor_jr_ui.html).
 
 In this blog, we've covered the complete code behind running PRIMUS. Over the course of these three blogs, I believe I've provided enough detail for anyone to attempt building their own version of the project. As a side note, I've also migrated the entire project to a Raspberry Pi, adding a camera with pan-tilt control for the robot. However, I’m not planning to cover its code in a blog just yet. I've included a photo of the Raspberry-pi PRIMUS.
