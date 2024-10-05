@@ -56,8 +56,8 @@ You can think of it like a light switch that you can turn on and off very quickl
 
 ![PWM average output voltage.](/img/BlogPrimus/images/blog2/PWM_Blog2.jpg)
 
-By varying the duration that the flashlight remains on compared to when it is off, you can control its brightness. The average voltage produced through PWM is proportional to the width of the pulses, which is known as the **Duty Cycle**. The Duty cycle is calculated as 
-```
+By varying the duration that the flashlight remains on compared to when it is off, you can control its brightness. The average voltage produced through PWM is proportional to the width of the pulses, which is known as the **Duty Cycle**. The Duty cycle is calculated as:
+```text
 Duty_Cycle(%) = ( Time_ON / Time_ON + Time_OFF ) × 100
 ```
 A higher duty cycle results in a higher average voltage applied to the DC motor, leading to an increase in motor speed. Conversely, a shorter duty cycle means a lower average voltage applied to the DC motor, resulting in a decrease in motor speed.
