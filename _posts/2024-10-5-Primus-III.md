@@ -9,7 +9,8 @@ header-img: img/BlogPrimus/images/blog3/thumbnail_Blog3.jpeg
 
 # PRIMUS-III
 
-Hello there! I'm excited to share the final installment in our PRIMUS series, where we'll dive into the technical aspects that bring this project to life. If you're eager to access the complete code and schematics, you can find them at this [link](https://github.com/seeker316/Primus). 
+Hello there! I'm excited to share the final installment in our PRIMUS series, where we'll dive into the technical aspects that bring this project to life. If you're eager to access the complete code and schematics, you can find them at this [link](https://github.com/seeker316/Primus).
+
 But before we get into the heavy stuff, let’s start with something simple—how does PRIMUS communicate? How are we able to control this robot wirelessly from our phones or laptops? The magic happens thanks to the brains of PRIMUS: the ESP32. It is a robust and cost-effective microcontroller that combines Wi-Fi connectivity with real-time processing capabilities, as I mentioned in the first [blog](https://seeker316.github.io/2024/04/19/Primus/). This allows it to handle both the remote control interface and motor control simultaneously, making it the perfect choice for our project.
 
 The ESP32 is set up as both a Wi-Fi-connected HTTP server and a WebSocket server, enabling two forms of communication: traditional web access and real-time data exchange. Here's how the remote control and communication happen over the network:
