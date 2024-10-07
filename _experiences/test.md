@@ -2,10 +2,13 @@
 layout: post
 header-style: text
 title: Rust notes
-img: img/experience/test2.png
+img: img/experience/Rustacean.png
 ---
 
 # RUST
+
+**Rust** is a modern systems programming language focusing on safety, speed, and concurrency. It accomplishes these goals by being memory safe without using garbage collection.
+
 ## Comments
 - Regular comments which are ignored by the compiler:
 // Line comments which go to the end of the line.
