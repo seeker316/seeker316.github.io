@@ -1,8 +1,8 @@
 ---
 layout: post
 header-style: text
-title: Rust notes
-img: img/experience/Rustacean.png
+title: Operating systems basics
+img: img/experience/os_basics.jpg
 ---
 
 # OS_NOTES
