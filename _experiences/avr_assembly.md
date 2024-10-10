@@ -154,6 +154,7 @@ The **BRNE** (Branch if Not Equal) instruction is used for conditional branching
 1. Before using BRNE, a comparison is typically made using CP (Compare Register) or CPI (Compare Immediate).
 2. BRNE checks the Zero flag (Z). If Z is cleared (meaning the two compared values are not equal), the program control jumps to the specified label.
 3. If Z is set (the values are equal), the program continues executing the next instruction sequentially.
+
 ```assembly
 
 ; Example of a Conditional Jump
