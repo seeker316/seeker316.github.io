@@ -79,16 +79,16 @@ avrdude -p m328p -c stk5001 - b 57600 /dev/tty/USB0 -U flash:w:hello
 > To include a file in assembly we use the .include directive **.include "filepath"**
 
 > **ldi** stands for "load immediate", here in are loading bin value in the r16 working register.
-```assembly
+```
 ldi r16, 0b00100000 
 ```
 > To write data from a register to an I/O port we use the **out** instruction. It copies the general purpose registers to an I/O register.
-```assembly
+```
 out PortB, r16
 ```
 > to complete our simple hello world program and keep it running, we need a label. A label in assembly is a named marker that represents a specific memory address or location in the code, used for branching, jumps, or data reference.
 int the next line we jump to the label creating a infinite loop
-```assembly
+```
 Start:
    rjmp Start
 ```
@@ -131,7 +131,7 @@ Types -
 
 **JMP** The JMP (Jump) instruction is used to transfer program control to a specified address. there are 2 types of jumps conditional and unconditional
 In unconditional jump the CPU executes the JUMP regardless of any condition.
-```assembly
+```
 
 ; Example of an Unconditional Jump
 START:
@@ -155,7 +155,7 @@ The **BRNE** (Branch if Not Equal) instruction is used for conditional branching
 2. BRNE checks the Zero flag (Z). If Z is cleared (meaning the two compared values are not equal), the program control jumps to the specified label.
 3. If Z is set (the values are equal), the program continues executing the next instruction sequentially.
 
-```asm
+```
 
 ; Example of a Conditional Jump
 START:
@@ -204,7 +204,7 @@ Set Global Interrupt Flag: Use the SEI instruction.
 Handle the Interrupt: Implement the necessary actions in the ISR.
 Return from Interrupt: Use the RETI instruction to return to the main program.
 
-```asm
+```
 .include "m328Pdef.inc"  ; Include device definitions
 
 .org 0x00                ; Reset vector
