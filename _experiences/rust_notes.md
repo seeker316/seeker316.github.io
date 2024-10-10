@@ -103,6 +103,7 @@ Variables are immutable by default in Rust. Therefor to edit a variable value yo
     const KILLER_COUNT: u32 = 100_0000; // underscores don't change varible values thy can be used for more easy read ability
 ```
 Difference between variables and constants
+
 | Feature           | Variable                      | Constant                     |
 |-------------------|-------------------------------|------------------------------|
 | Declaration       | `let`                         | `const`                      |
@@ -307,6 +308,7 @@ fn main() {
 ```
 ## Ownership in rust
 Ownership model is the way to manage memory in rust.
+
 | Memory Management    | Pros                                                   | Cons                                                  |
 |----------------------|--------------------------------------------------------|-------------------------------------------------------|
 | **Garbage Collector**| - Automatic memory management                          | - Non-deterministic deallocation                      |
