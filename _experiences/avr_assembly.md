@@ -155,7 +155,7 @@ The **BRNE** (Branch if Not Equal) instruction is used for conditional branching
 2. BRNE checks the Zero flag (Z). If Z is cleared (meaning the two compared values are not equal), the program control jumps to the specified label.
 3. If Z is set (the values are equal), the program continues executing the next instruction sequentially.
 
-```assembly
+```asm
 
 ; Example of a Conditional Jump
 START:
@@ -204,7 +204,7 @@ Set Global Interrupt Flag: Use the SEI instruction.
 Handle the Interrupt: Implement the necessary actions in the ISR.
 Return from Interrupt: Use the RETI instruction to return to the main program.
 
-```assembly
+```asm
 .include "m328Pdef.inc"  ; Include device definitions
 
 .org 0x00                ; Reset vector
