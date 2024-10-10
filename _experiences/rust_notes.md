@@ -1,3 +1,10 @@
+---
+layout: post
+header-style: text
+title: Rust notes
+img: img/experience/Rustacean.png
+---
+
 # Rust
 
 **Rust** is a modern systems programming language focusing on safety, speed, and concurrency. It accomplishes these goals by being memory safe without using garbage collection.
@@ -455,103 +462,3 @@ fn main() {
 }
 
 ```
-## Enums
-In Rust, an enum (short for enumeration) is a powerful feature that allows you to define a type by enumerating its possible variants. You can create an instance of an enum by specifying one of its variants. Enum variants can hold data. Each enum variants can store different types of data, including tuples, structs, or even other enums.
-
-Enum methods are similar to struct methods, and they are defined within an impl block associated with the enum. Methods on enums allow you to define behavior specific to that enum and its variants. You can define methods that act on the enum as a whole, or you can define methods that operate on specific variants of the enum.
-```rust
-enum Message {
-    Quit,                       // No data
-    Move { x: i32, y: i32 },    // Named fields like a struct
-    Write(String),              // Holds a String
-    ChangeColor(i32, i32, i32), // Holds a tuple of i32 values
-}
-
-impl Message {
-    // A method that processes the message
-    fn call(&self) {
-        match self {
-            Message::Quit => println!("Quit message"),
-            Message::Move { x, y } => println!("Move to ({}, {})", x, y),
-            Message::Write(text) => println!("Text: {}", text),
-            Message::ChangeColor(r, g, b) => println!("Change color to ({}, {}, {})", r, g, b),
-        }
-    }
-}
-
-fn main(){
-
-   let msg = Message::Move { x: 10, y: 20 };
-   let text = Message::Write("Hello".to_string()); 
-   msg.call(); 
-   text.call();
-}
-
-```
-### Match with enum
-One of the main advantages of enums in Rust is the ability to use match expressions to handle different variants. The match expression here matches on the msg enum and executes different code depending on which variant is encountered.
-```rust
-    fn main() {
-        let msg = Message::Move { x: 10, y: 20 };
-
-        match msg {
-            Message::Quit => println!("Quit message"),
-            Message::Move { x, y } => println!("Move to ({}, {})", x, y),
-            Message::Write(text) => println!("Text: {}", text),
-            Message::ChangeColor(r, g, b) => println!("Color: ({}, {}, {})", r, g, b),
-        }
-    }
-
-```
-### if let in enum
-if let and while let for Enums While match is the most common way to handle enums, Rust also provides the if let and while let constructs for simpler cases where you only care about one specific variant. This is a more concise way of handling cases when you only care about one enum variant.
-```rust
-let msg = Message::Write(String::from("Hello"));
-
-if let Message::Write(text) = msg {
-    println!("Message: {}", text);
-}
-```
-### Option Enum
-Enums with Option is a commonly used enums in Rust , which is built into the standard library:
-
-**Option<T> Enum**
-This is used for values that might be absent. It has two variants:
-- Some(T) represents a value.
-- None represents no value.
-
-Sometimes, you might want to get the value inside an Option directly. You can use the unwrap() method to do this, but it’s unsafe because it will panic if the Option is None.
-```rust
-fn main(){
-
-    let number = Some(5);
-    let phrase = Some("raise hell!")
-    let no_num: Option<i32> = None;
-
-    println!("Some number: {}", number.unwrap());
-    // Uncommenting the line below will cause a panic because no_number is None
-    // println!("No number: {}", no_number.unwrap());
-}
-```rust
-**Match with option enum**
-fn main() {
-    let some_number = Some(5);
-    let no_number: Option<i32> = None;
-
-    match some_number {
-        Some(value) => println!("We have a value: {}", value),
-        None => println!("No value"),
-    }
-}
-```
-**if let with option enum**
-You can use if let to handle the Some case in a more concise way, especially when you only care about whether a value exists.
-```rust
-let some_number = Some(10);
-
-if let Some(value) = some_number {
-    println!("The number is: {}", value);
-}
-```
-
-
