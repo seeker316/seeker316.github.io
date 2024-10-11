@@ -563,3 +563,517 @@ if let Some(value) = some_number {
     println!("The number is: {}", value);
 }
 ```
+## Module System
+
+### Crates
+In Rust, a crate is the fundamental unit of compilation and package management. A crate can be a binary or a library, and Rust uses the term "crate" to refer to code packages that are either standalone applications (binaries) or reusable code libraries.
+**Types**:
+1. **Binary crate**: produces an executable program. It contains a main function, which is the entry point of the application.
+    E.g main.rs file
+    ```rust
+    fn main() {
+    println!("Hello, world!");
+    }
+    ```
+2. **Library crate**: defines reusable code but does not produce an executable. It does not have a main function, but instead, it provides functions, types, and modules that other crates (or projects) can use.
+    E.g lib.rs file
+    ```rust
+    pub fn greet() {
+    println!("Hello from the library crate!");
+    }
+    ```
+
+**Rules for crates**
+- A package must have at least one crate.
+- A package must have either 0 library crates or 1 library crate.
+- A package can have any number of binary crates.
+
+> If lib.rs is defined in the source directory rust will automatically create a library crate with the same name as your package and lib.rs will be the crate group. one can create this directly while creating the workspace by 
+    ```
+    cargo new --lib workspace_name
+    ```
+    a lib.rs is automatically created with a test module.
+
+> In case of needed more binary crates one can create a directory named bin and in that folder can define required rust files, each file in this folder will represent a binary crate.
+
+### Module
+Modules in rust is a way to organize code into namespaces that help manage complexity and scope by allowing logical grouping of related functions, types, and traits. Modules also control visibility (public or private) and enable code reuse across different parts of a project.
+
+Modules are defined using the ```mod``` keyword. You can define them inline within a file, or split them across multiple files for better organization.
+Functions inside my_module are private by default, but you can use the pub keyword to make them public (accessible outside the module).
+
+Modules can be nested inside other modules, which helps create a hierarchy of namespaces.
+```super``` refers to the parent module (one level up). It is used to access items in the parent module from within a child (nested) module.
+
+The ```use``` keyword allows you to bring items from a module into scope, so you don’t have to use the full path every time.
+
+The ```self``` keyword refers to the current module. It is used to explicitly refer to items within the same scope (the current module), particularly when there might be ambiguity in module paths.
+
+The ```as``` keyword is used for type casting and renaming imports. It provides a way to convert one type into another or to give a new name to an imported item to avoid name conflicts or for clarity.
+```Rust
+mod my_module {
+    fn private_function() {
+        println!("This is private");
+    }
+    pub fn public_function() {
+        println!("This is public");
+    }
+
+    pub mod inner {
+        pub fn hello() {
+            super::public_function(); // Refers to my_module::public_function
+            println!("Hello from inner module");
+        }
+        pub fn greet() {
+        println!("hello, everyone");
+    }
+
+
+    }
+}
+
+fn main() {
+    my_module::public_function(); // Accessible
+    self::public_function();
+    // my_module::private_function(); // Error: not accessible
+    my_module::inner::hello();
+
+    use my_module::inner;
+    inner::greet();
+    use my_module::inner::greet;
+    greet();
+
+    use my_module::public_function as my_print;
+    my_print();
+}
+```
+
+The ```use``` keyword can also be used to bring external dependencies into scope.
+e.g adding a dependency through the cargo.toml file
+```toml
+[package]
+name = "guessing_game"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.5.5"
+colored = "2.0.0"
+```
+using ```use``` keyword in rust file to bring it in scope, nested paths can be used to include multiple files. To bring all items into from a dependency in a scope.
+```rust
+use rand::{Rng, CryptoRng, ErrorKind::Transient};
+use std::io::* //bringing all items in std::io in a scope
+fn main(){
+    let secret_number = rand::thread_rng().gen_range(1,101);
+}
+```
+
+**Splitting Modules into Different Files**
+To use these external module files (foo.rs and bar/mod.rs), you declare them in main.rs using the mod keyword.
+```
+src/
+├── main.rs       # Root file for a binary crate
+├── foo.rs        # Module 'foo'
+└── bar/
+    └── mod.rs    # Module 'bar', stored in a subdirectory
+```
+
+```Rust
+// main.rs
+mod foo; // Brings in foo.rs as a module
+mod bar; // Brings in bar/mod.rs as a module
+
+fn main() {
+    foo::hello(); // Using a function from foo module
+    bar::greet(); // Using a function from bar module
+}
+```
+
+##  Collections
+In Rust, collections are data structures that can hold multiple values. They are part of Rust's standard library and offer more flexibility than arrays or tuples, which have a fixed size. Collections can grow or shrink dynamically, making them useful when you need a data structure with a variable size.
+
+### Vectors
+
+A ```Vec<T>``` is a growable array.
+It stores elements of the same type, and its size can change dynamically.
+Vectors store their data on the heap, meaning they can grow dynamically as long as there’s memory available.
+
+- Creating a Vector
+
+    ```rust
+    //Create an empty vector and push elements to it later
+    let mut v: Vec<i32> = Vec::new();
+    v.push(1);
+    v.push(2);
+    v.push(3);
+    // You can initialize a vector with values:
+    let v = vec![1, 2, 3, 4];
+    ```
+- Accessing elements
+
+    ```rust
+    //using indexing; This can panic if index is out of bounds
+    let v = vec![1, 2, 3, 4];
+    println!("{}", v[2]); // Output: 3
+    
+    //using get method: returns an option, so it doesn't panic
+    if let Some(third) = v.get(2) {
+    println!("The third element is {}", third);
+    } else {
+        println!("There is no third element.");
+    }
+    ```
+- Modifying Vectors
+
+    ```rust
+    let mut v = vec![1, 2];
+    v.push(3); // v is now [1, 2, 3]
+    
+    let last = v.pop(); // last is Some(3), and v is now [1, 2]
+    
+    v[1] = 5; // v is now [1, 5]
+    ```
+- Iteration
+
+    ```rust
+    //immutable iteration
+    let v = vec![1, 2, 3];
+    for i in &v {
+        println!("{}", i);
+    }
+
+    //mutable iteration
+    let mut v = vec![1, 2, 3];
+    for i in &mut v {
+        *i += 1;
+    }
+    println!("{:?}", v); // Output: [2, 3, 4]
+    ```
+- Slicing Vectors
+
+    ```rust
+    let mut v = vec![1, 2, 3, 4, 5];
+    let slice = &mut v[1..3]; // slice contains [2, 3]
+    slice[0] = 10; // v is now [1, 10, 3, 4, 5]
+    ```
+- Other methods
+    - ```len``` : Returns the number of elements in the vector.
+    - ```is_empty()``` : Checks if the vector is empty.
+    - ```clear()``` : Removes all elements from the vector.
+    - ```extend()``` : Appends elements from another collection to the vector.
+
+
+### Strings
+A ```String``` is stored as a collection of UTF-8 encoded bytes allowing for efficient storage of multilingual text and can be resized or changed.
+Since characters in UTF-8 encoding can take up multiple bytes which makes direct indexing into strings tricky, trying to index a string by position could lead to errors. Rust prevents this for safety reasons.
+
+Rust provides two primary types for handling strings:
+1.  String (growable, heap-allocated)
+2.  &str (string slice, borrowed reference)
+
+
+- Creating a string  
+    ```rust
+    let mut s1 = String::from("Hello");
+    let mut s2  = "there".to_string();
+    ```
+- Appending/Concatenating a string
+    ```rust
+    s1.push_str(", world!"); // Appending to the string
+    
+    let s3 = s1 + &s2; // s1 (s1's ownership) is moved here, cannot be used after this
+
+    let s3 = format!("{}{}", s1, s2); // Doesn't move ownership, so s1 & s2 still can be used.
+    ```
+- Iterating over strings
+    
+    Since strings are stored as UTF-8 encoded bytes, you can iterate over them by characters, bytes, or graphemes (complex characters in Unicode).
+    ```rust
+    let s = String::from("Hello");
+    for c in s.chars() { // Iterate over characters
+        println!("{}", c);
+    }
+    
+    let s1 = String::from("नमस्ते");
+    for b in s.bytes() {
+        println!("{}", b); // Prints each byte value
+    }
+
+    ```
+    A grapheme is a user-perceived character that can consist of one or more Unicode code points, such as the Hindi letter "स्" which is made up of the consonant "स" and the halant "्" (a diacritical mark that suppresses the inherent vowel).
+    
+    Iterating over grapheme clusters requires the use of an external crate, as the standard library doesn't directly provide this functionality.
+    
+    ```toml
+    [dependencies]
+    unicode-segmentation = "1.10.1"
+    ```
+    
+    ```rust
+    use unicode_segmentation::UnicodeSegmentation;
+    fn main() {
+        let s = "नमस्ते 🌍"; // Contains complex Unicode characters, including emoji
+
+        // Iterate over grapheme clusters
+        for grapheme in s.graphemes(true) {
+            println!("{}", grapheme);
+        }
+    }
+    ```
+
+### Hash maps
+A ```HashMap<K, V>``` stores key-value pairs, where K is the type of the keys and V is the type of the values.
+HashMap provides efficient lookup based on keys.
+
+- **Creating a HashMap**
+
+    A HashMap can be created using the HashMap::new() method or with the collect method
+- **Accessing values**
+
+    You can retrieve a value from a HashMap using the ```get``` method, which takes a reference to the key and returns an Option<&V> (which will be Some(&V) if the key exists, or None if it does not).
+
+- **Updating values**
+    There are several ways:
+    - Overwriting the Value for an Existing Key: Inserting a value with an existing key will replace the old value.
+
+    - Inserting a Value Only If the Key Doesn’t Exist: Use ```entry()``` to insert a value for a key only if that key does not already have a value.
+    
+    - Updating a Value Based on the Old Value: You can modify the value by first accessing the entry and then updating it.
+    
+    ```rust
+        use std::collections::HashMap;
+
+    fn main() {
+        // Create a new, empty HashMap
+        let mut scores = HashMap::new();
+
+        // Insert key-value pairs into the HashMap
+        scores.insert(String::from("Blue"), 10);
+        scores.insert(String::from("Red"), 50);
+
+        println!("{:?}", scores);
+
+        let score = scores.get("Blue"); //Accessing values 
+        match score {
+            Some(s) => println!("Score: {}", s),
+            None => println!("No score found"),
+        }
+
+        scores.insert(String::from("Blue"), 25); // Overwrites the previous value
+
+        scores.entry(String::from("Yellow")).or_insert(50); // Inserts 50
+        scores.entry(String::from("Blue")).or_insert(100);  // Does nothing
+
+        if let Some(score) = scores.get_mut("Blue") { //Updating a Value Based on the Old Value
+        *score += 10;
+        }
+    }
+    ```
+- Iterating over HashMaps
+
+    You can iterate over all the key-value pairs in a HashMap using a for loop.
+
+    ```rust
+     for (key, value) in &scores {
+        println!("{}: {}", key, value);
+    }
+    ```
+
+## Error handling
+
+### Panic 
+A panic occurs when the program encounters an unrecoverable error, such as accessing an out-of-bounds array index or attempting to unwrap an Option that is None. When a panic occurs, Rust unwinds the stack, cleaning up resources as it goes, and eventually terminates the program.
+You can also manually trigger a panic using the ```panic!``` macro, providing a custom message:
+```rust
+fn main() {
+    panic!("This is a custom panic message!");
+}
+```
+
+**RUST_BACKTRACE** is an environment variable in Rust that controls the generation of backtraces when a program panics. When enabled, it provides detailed information about the call stack at the time of the panic, which is invaluable for debugging.
+- Setting it to '1' will show a limited backtrace that includes the panic message and a few frames of the call stack.
+    ```shell
+    RUST_BACKTRACE=1 cargo run
+    ```
+
+- Setting it to 'full'  provides a complete backtrace with more detailed information about each frame, including the file names and line numbers.
+    ```shell
+    RUST_BACKTRACE=full cargo run
+    ```
+
+### Recoverable errors
+Recoverable errors are those that do not cause the program to terminate abruptly.
+For this purpose, rust provides two important types: Result and Option.
+
+**Result<T, E>**
+
+The Result type is used for functions that can return an error. It is an enum that has two variants:
+- Ok(T): Represents a successful operation and contains a value of type T.
+- Err(E): Represents a failure and contains an error value of type E.
+
+In this example:
+
+The ```read_username_from_file``` function returns a ```Result<String, io::Error>```, indicating it either returns a username or an ```io::Error```.
+
+The ```?``` operator is used to propagate errors in functions that return Result. When you use the ? operator:
+
+- If the result is Ok, it extracts the value.
+- If it’s Err, it returns the error from the current function.
+
+
+Here if ```File::open``` or ```read_to_string``` returns an Err, the error will be returned immediately from the function.
+
+```rust
+use std::fs::File;
+use std::io::{self, Read};
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut file = File::open("username.txt")?; // ? operator propagates errors
+    let mut username = String::new();
+    file.read_to_string(&mut username)?;
+    Ok(username) // Return Ok with the username
+}
+
+fn main() {
+    match read_username_from_file() {
+        Ok(username) => println!("Username: {}", username),
+        Err(e) => println!("Error reading username: {}", e),
+    }
+}
+```
+
+**```unwrap```** is a method that can be called on the Result enum to retrieve the value inside an ```Ok``` variant or cause a panic if it encounters an ```Err``` variant.
+
+**```Expect```** method can be used to specify the error message that gets passed to the panic macro.
+
+```rust
+let result: Result<i32, &str> = Ok(42);
+let value = result.expect("Failed to get the value"); // value is 42
+
+let result_err: Result<i32, &str> = Err("An error occurred");
+let value_err = result_err.expect("Expected an Ok value"); // This will panic with the message: "Expected an Ok value"
+```
+
+### Custom error types
+
+You can define your own error types by creating an enum that implements the std::error::Error trait. This is useful for complex applications where you want to handle multiple error types.
+```rust
+use std::fmt;
+
+#[derive(Debug)]
+enum MyError {
+    NotFound,
+    PermissionDenied,
+}
+
+impl fmt::Display for MyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            MyError::NotFound => write!(f, "Item not found"),
+            MyError::PermissionDenied => write!(f, "Permission denied"),
+        }
+    }
+}
+
+impl std::error::Error for MyError {}
+
+fn perform_action() -> Result<(), MyError> {
+    // Simulate an error
+    Err(MyError::NotFound)
+}
+
+fn main() {
+    match perform_action() {
+        Ok(_) => println!("Action performed successfully!"),
+        Err(e) => println!("Error: {}", e),
+    }
+}
+```
+
+
+## Generic Types 
+
+Generics in Rust allow you to write flexible, reusable code by enabling the definition of functions, structs, enums, and traits that can operate on multiple types without sacrificing type safety.
+
+### Generic functions
+ You can define functions that take parameters of any type. 
+ This is done using angle brackets **(<>)** to specify the type parameters.
+
+```rust
+fn print_value<T>(value: T) {
+    println!("{:?}", value);
+}
+
+fn main() {
+    print_value(42);          // Works with an integer
+    print_value("Hello");     // Works with a string
+}
+```
+### Generic Structs / Enums
+
+You can create structs that can hold values of any type. Similarly, enums can also be defined with generics.
+
+```rust
+struct Pair<T, U> { //here since there are 2 generic types described the variables can be of different datatypes as well.
+    first: T,
+    second: U,
+}
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+fn main() {
+    let pair = Pair { first: 1, second: "one" };
+    println!("Pair: ({}, {})", pair.first, pair.second);
+
+    let success = Result::Ok(42);
+    let error: Result<i32, &str> = Result::Err("error occurred");
+}
+```
+
+### Generic methods
+In Rust, you can also use generics in methods, allowing methods of structs or enums to operate on types specified as parameters.
+```rust
+struct Pair<T, U> {
+    first: T,
+    second: U,
+}
+
+impl<T, U> Pair<T, U> {
+    fn new(first: T, second: U) -> Self {
+        Pair { first, second }
+    }
+
+    fn first(&self) -> &T {
+        &self.first
+    }
+
+    fn second(&self) -> &U {
+        &self.second
+    }
+
+    fn compare<F>(&self, func: F) -> bool
+    where
+        F: Fn(&T, &U) -> bool, // F must be a function that takes references to T and U
+    {
+        func(&self.first, &self.second)
+    }
+}
+
+fn main() {
+    let pair = Pair::new(5, "Hello");
+
+    // Accessing the first and second values
+    println!("First: {}", pair.first());
+    println!("Second: {}", pair.second());
+
+    // Comparing values using a closure
+    let is_greater = pair.compare(|x, y| x > &10); // Compare the first value with 10
+    println!("Is the first value greater than 10? {}", is_greater);
+}
+
+
+```
