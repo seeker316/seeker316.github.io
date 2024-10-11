@@ -127,7 +127,7 @@ IN R0, PINB
 
 *Branch instructions in AVR assembly are used to control the flow of execution by allowing the program to jump to different sections of code based on certain conditions or unconditionally.*
 
-Types - 
+**Types** - 
 
 **JMP** The JMP (Jump) instruction is used to transfer program control to a specified address. there are 2 types of jumps conditional and unconditional
 In unconditional jump the CPU executes the JUMP regardless of any condition.
