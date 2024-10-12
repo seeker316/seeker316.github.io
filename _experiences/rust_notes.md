@@ -1382,7 +1382,7 @@ This command compiles and runs all tests in the project. By default,
 Rust runs the tests in parallel, which speeds up testing for larger 
 codebases.
 
-## Integration testing
+### Integration testing
 Integration tests are used to test how different parts of your code 
 work together. They live in the tests directory at the root of your 
 project and are meant to test the public API of your crate (library 
@@ -1419,7 +1419,7 @@ fn test_add() {
 
 ```cargo test --test integration_test```
 
-## Should panic
+### Should panic
 
 The ```#[should_panic]``` test attribute in Rust is used to indicate that 
 a particular test is expected to panic during its execution. If the
@@ -1461,7 +1461,7 @@ mod tests {
     }
 }
 ```
-## Test options
+### Test options
 
 1. **Run specific tests by name:**
 
