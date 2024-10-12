@@ -1074,6 +1074,439 @@ fn main() {
     let is_greater = pair.compare(|x, y| x > &10); // Compare the first value with 10
     println!("Is the first value greater than 10? {}", is_greater);
 }
+```
 
+## Traits
+Traits are a powerful way to define shared behavior across multiple types. Traits
+define a set of methods that can be implemented for any type (structs, enums, etc.) Each type provides its own implementation for the methods required by the trait., allowing different types to share common behavior while still being distinct. 
+It specifies what methods must be implemented, but not how.
+
+Traits also provide default implementations for some or all of their methods. This allows types to use the default behavior or override it with a custom implementation.
+You can write functions that accept parameters constrained by traits, meaning the function will work with any type that implements a specific trait.
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+
+struct NewsArticle {
+    headline: String,
+    location: String,
+    content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{} - {}", self.headline, self.location)
+    }
+}
+
+fn notify(item: impl Summary) { //function that accepts parameters constrained by a trait.
+    println!("Breaking news: {}", item.summarize());
+}
+
+struct Tweet {
+    username: String,
+    content: String,
+}
+
+impl Summary for Tweet {} //Default implementation
+```
+
+You can use traits to define the types of function parameters 
+or return values by using the ```impl``` Trait syntax.
+
+Rust also allows **dynamic dispatch** using trait objects. 
+This is useful when you want a collection of different types 
+that implement the same trait, or when the exact type isn't known 
+at compile time. Trait objects are created using references like 
+```&dyn``` Trait or ```Box<dyn Trait>```.
+
+```rust
+fn notify(item: impl Summary) { //traits as paramters
+    println!("Breaking news: {}", item.summarize());
+}
+
+
+fn notify(item: &dyn Summary) { //dynamic dispatch using traits
+    println!("Notification: {}", item.summarize());
+}
+
+fn returns_summarizable() -> impl Summary { //traits as return types
+    Tweet {
+        username: String::from("user"),
+        content: String::from("This is a tweet."),
+    }
+}
+
+
+
+let article = NewsArticle {
+    headline: String::from("Headline"),
+    location: String::from("Location"),
+    content: String::from("Content"),
+};
+
+notify(&article); // Use a trait object (dynamic dispatch)
 
 ```
+
+### Trait Bounds
+Trait bounds are a way to specify that a generic type must implement one or more traits. 
+This allows you to constrain the types that can be used in a function, struct, or method to those that implement the required behavior.
+
+You can specify multiple traits for a type using the ```+``` syntax. 
+```rust
+use std::fmt::Display;
+
+fn print_value<T: Display>(value: T) {
+    println!("{}", value);
+}
+
+fn compare_and_print<T: Display + PartialOrd>(a: T, b: T) {
+    if a > b {
+        println!("{} is greater than {}", a, b);
+    } else {
+        println!("{} is less than or equal to {}", a, b);
+    }
+}
+
+fn main() {
+    print_value(42);       // Works because i32 implements Display
+    print_value("Hello");  // Works because &str implements Display
+
+    compare_and_print(10, 20);  // Works with i32 as it implements both Display and PartialOrd
+    compare_and_print(3.5, 2.1); // Works with f64 too
+}
+```
+Sometimes, if the number of trait bounds grows or the syntax 
+becomes too complex, the where clause provides a cleaner alternative. 
+The where clause separates the trait bounds from the function 
+signature, improving readability.
+
+```rust
+fn compare_and_print<T>(a: T, b: T)
+where
+    T: Display + PartialOrd,
+{
+    if a > b {
+        println!("{} is greater than {}", a, b);
+    } else {
+        println!("{} is less than or equal to {}", a, b);
+    }
+}
+```
+
+### Blanket implementations
+
+Rust also supports blanket implementations, which allow you to 
+implement a trait for all types that satisfy a particular trait 
+bound. For example, you could  implement a trait for all types 
+that implement another trait.
+
+```rust
+impl<T: Display> ToString for T {
+    fn to_string(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+/*This implements the ToString trait for any type T that 
+implements Display. In effect, this is saying, "Any type 
+that can be displayed can also be converted to a string."*/
+```
+
+## Lifetimes
+
+In Rust, lifetimes are a mechanism for tracking how long references
+are valid, ensuring memory safety without needing a garbage collector.
+Rust’s ownership system manages memory via ownership, borrowing, and
+lifetimes. Lifetimes help the compiler understand the scope of 
+references and ensure that they don’t outlive the data they point to.
+
+Lifetimes are annotated with a special syntax: ```'a```, ```'b```, etc., 
+where ```'a``` represents a particular lifetime. Both x and y have 
+the lifetime 'a, and the result has the same lifetime 'a. This 
+guarantees that the returned reference is only valid as long as
+both x and y are valid.
+
+In the ```longest``` function, we return a reference to either ```x``` or ```y```, but the returned reference must not outlive either of the input references.
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let string1 = String::from("long string");
+    let string2 = "short";
+    
+    let result = longest(&string1, &string2);
+    println!("The longest string is {}", result);
+}
+
+fn main() {
+    let string1 = String::from("long string");
+    let result;
+    {
+        let string2 = String::from("short string");
+        result = longest(&string1, &string2);
+        // `string2` goes out of scope here, but `result` still references it
+    }
+    println!("The longest string is {}", result); // Error: `result` is referencing `string2`
+}
+
+// Lifetime in a struct
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+
+    // Create an instance of ImportantExcerpt with a reference to the first sentence
+    let excerpt = ImportantExcerpt {
+        part: first_sentence,
+    };
+
+    // The struct can only hold the reference as long as 'novel' is valid
+    println!("Excerpt: {}", excerpt.part);
+}
+```
+
+### Lifetime Elision
+
+In simple cases, Rust can infer lifetimes without explicit annotations 
+through lifetime elision rules. The compiler applies these rules to 
+reduce the need for writing lifetimes manually in straightforward 
+cases. There are three basic elision rules:
+
+- **Rule 1:** Each parameter that is a reference gets its own lifetime.
+    *E.g:* ```fn foo(x: &i32)``` becomes ```fn foo<'a>(x: &'a i32)```.
+
+- **Rule 2:** If there is exactly one input lifetime parameter, that 
+    lifetime is assigned to all output references.
+    *E.g:* ```fn foo(x: &i32) -> &i32``` becomes ```fn foo<'a>(x: &'a i32) -> &'a i32```
+
+- **Rule 3:** If there are multiple input lifetime parameters, but 
+    one of them is &self or &mut self (for methods), the lifetime 
+    of self is assigned to all output references.
+    E.g: ```fn foo(&self, x: &i32) -> &i32``` becomes 
+    ```fn foo<'a>(&'a self, x: &'a i32) -> &'a i32```
+
+### Static Lifetimes
+The ```'static``` lifetime is a special lifetime that applies to 
+references that live for the entire duration of the program. Data 
+with the ```'static``` lifetime is stored in the program’s binary 
+(for example, string literals).
+
+Here, the string literal "I am a static string" has a 
+'static lifetime because it is hardcoded into the program and 
+will always be available throughout the program’s execution.
+```rust
+fn static_str() -> &'static str {
+    "I am a static string"
+}
+
+fn main() {
+    let s = static_str();
+    println!("{}", s);
+}
+```
+
+## Testing in Rust
+Rust provides a powerful and built-in testing framework to write 
+and run tests for code.  It ensures that your code behaves as 
+expected, preventing bugs and regressions. This framework supports
+writing unit tests, integration tests, and documentation tests, 
+all with a focus on safety and correctness.
+
+### Unit Testing
+
+A simple unit test is written using the ```#[test]``` attribute 
+before a function.
+
+These macros are used to check conditions and will panic if the conditions are not
+met. If a test panics, it is considered a failure.
+- ```assert_eq!```(left, right) : checks if the left and right expressions are equal.
+
+- ```assert_ne!```(left, right) : checks if they are not equal.
+
+- ```assert!```(condition) : checks if the condition is true.
+
+You can add custom failure messages to the assert!, assert_eq!, and
+assert_ne! macros. 
+
+```rust
+// Function to be tested
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// Unit tests
+#[cfg(test)]
+mod tests {
+    // Import the outer function for testing
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        assert_eq!(add(2, 3), 5); // This will pass
+    }
+
+    #[test]
+    fn test_add_negative() {
+        //custom error message
+        assert_eq!(add(-2,-3),-7, "Expected {} to be equal to {}", add(-2,-3),-2-3);
+    }
+
+    #[test]
+    fn test_add_fail() {
+        assert_ne!(add(2, 2), 5); // This will pass, 2 + 2 is not equal to 5
+    }
+}
+
+```
+
+To run tests, use the following command in the terminal:
+```shell
+cargo test
+```
+This command compiles and runs all tests in the project. By default,
+Rust runs the tests in parallel, which speeds up testing for larger 
+codebases.
+
+## Integration testing
+Integration tests are used to test how different parts of your code 
+work together. They live in the tests directory at the root of your 
+project and are meant to test the public API of your crate (library 
+or binary). Unlike unit tests, integration tests are kept in separate 
+files and do not have direct access to private functions or modules.
+You can't directly test binary crates with integration tests, this is 
+why it is common to see a binary crate as a wrapper around Library crate,
+so that you can run integration tests.
+```
+project-root/
+├── src/
+│   └── lib.rs
+└── tests/
+    └── integration_test.rs
+```
+**In src/lib.rs:**
+```rust
+pub fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+```
+**In tests/integration_test.rs:**
+No need of seperate test module
+```rust
+// Integration test for the `add` function
+extern crate project_name;
+
+#[test]
+fn test_add() {
+    assert_eq!(project_name::add(2, 3), 5);
+}
+```
+**To run integration tests:** 
+
+```cargo test --test integration_test```
+
+## Should panic
+
+The ```#[should_panic]``` test attribute in Rust is used to indicate that 
+a particular test is expected to panic during its execution. If the
+test function does not panic, the test will fail.
+
+```rust
+
+fn divide(a: i32, b: i32) -> i32 {
+    if b == 0 {
+        panic!("Division by zero is not allowed!");
+    }
+    a / b
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn test_divide_by_zero() {
+        divide(1, 0);  // This should panic
+    }
+}
+```
+You can also specify an optional expected parameter to the 
+```#[should_panic]``` attribute, which allows you to check that 
+the panic message contains specific text. 
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic(expected = "Division by zero is not allowed!")]
+    fn test_divide_by_zero() {
+        divide(1, 0);  // This will panic with the specified message
+    }
+}
+```
+## Test options
+
+1. **Run specific tests by name:**
+
+    ```cargo test test_name```
+    E.g ```cargo test test_add``` 
+
+2. **Filter tests by substring:**
+
+    You can run all tests that match a specific substring: ```cargo test substring```
+     E.g : ```cargo test add``` for all those tests containing add in their name.
+3. **Filter tests by module:**
+    
+    ```cargo test test::``` this will run all tests from module test.
+
+4. **Run ignored tests:**
+    If you've marked tests with #[ignore], you can run only the ignored tests using:
+    ```rust
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        #[ignore]
+        fn expensive_test() {
+            // A long-running test that you want to skip by default
+        }
+    }
+    ```
+    To ignore those tests
+    ```cargo test -- --ignored```
+
+5. **Disable output capture:** By default, Rust tests capture output (println! statements). To display output even for passing tests, use:
+    
+    ```cargo test -- --nocapture```
+
+6. **Limit the number of test threads:**  You can limit the number 
+    of threads running tests in parallel by specifying the 
+    ```--test-threads``` option. This is helpful when you want to 
+    reduce system load or debug race conditions.
+    E.g: Run tests using only one thread.
+
+    ```cargo test -- --test-threads=1```
+
+7. Show more detailed output:
+    To display verbose output of test execution, use:
+
+    ```cargo test -- --test-threads=1 --nocapture --exact```
+
