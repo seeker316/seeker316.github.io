@@ -1811,16 +1811,16 @@ Types :
 
 > Sometimes, you want to expose part of your API in a simpler way by re-exporting modules, types, or functions. This is especially useful for larger crates where you want users to access common functionality without going deep into module hierarchies.
 ```
-// Re-exporting the entire math module under the root.
-pub use crate::math;
+    // Re-exporting the entire math module under the root.
+    pub use crate::math;
 ```
-> Now, users can access add and multiply directly from the crate root:
 
+> Now, users can access add and multiply directly from the crate root,
 ```rust
-// Before:
-use my_crate::math::add;
-// After:
-use my_crate::add;
+    // Before:
+    use my_crate::math::add;
+    // After:
+    use my_crate::add;
 ```
 
 > Running Tests in Documentation : Rust’s rustdoc allows you to write code examples inside your 
