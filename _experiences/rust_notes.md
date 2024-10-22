@@ -1815,19 +1815,19 @@ Types :
 pub use crate::math;
 ```
 > Now, users can access add and multiply directly from the crate root:
+
 ```rust
 // Before:
 use my_crate::math::add;
-
 // After:
 use my_crate::add;
-
 ```
 
 > Running Tests in Documentation : Rust’s rustdoc allows you to write code examples inside your 
 documentation comments and automatically test them.
-```
-cargo test
+
+```shell
+    cargo test
 ```
 
 ### Step-by-Step Guide to Publishing a Crate on Crates.io
