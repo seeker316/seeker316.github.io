@@ -5,7 +5,7 @@ title: Rust notes
 img: img/experience/Rustacean.png
 ---
 
-# Rust
+# The Rust Book
 
 **Rust** is a modern systems programming language focusing on safety, speed, and concurrency. It accomplishes these goals by being memory safe without using garbage collection.
 To compile a rust program, in terminal just type 
@@ -1083,7 +1083,7 @@ It specifies what methods must be implemented, but not how.
 
 Traits also provide default implementations for some or all of their methods. This allows types to use the default behavior or override it with a custom implementation.
 You can write functions that accept parameters constrained by traits, meaning the function will work with any type that implements a specific trait.
-
+ 
 ```rust
 pub trait Summary {
     fn summarize(&self) -> String {
@@ -1510,3 +1510,375 @@ mod tests {
 
     ```cargo test -- --test-threads=1 --nocapture --exact```
 
+## Closures
+closures in Rust are anonymous functions that can capture variables 
+from their environment. They are similar to functions, but with 
+additional flexibility, allowing them to access variables from 
+the scope in which they were defined. 
+
+```rust
+let closure = |param1, param2| {
+    // Body of the closure
+    //if closure is a single expression, braces are optional
+};
+
+let x = 10;
+
+let add_to_x = |y| x + y;  // `x` is captured by reference
+
+println!("{}", add_to_x(5));  // Output: 15
+
+```
+### Refactoring using closures
+Suppose you have multiple functions or code blocks that perform 
+similar operations, but with minor differences. You can refactor 
+the code by abstracting the common iteration and transformation 
+logic into a reusable function that takes a closure as an 
+argument to define the operation. In order to define structs, enums or 
+functions paramters that use closures we need to use generics and
+trait values.
+Rust’s type system determines how variables are captured, and 
+closures can be categorized into three traits:
+- Fn: Captures variables by reference.
+- FnMut: Captures variables by mutable reference.
+- FnOnce: Captures variables by taking ownership (consumes the environment).
+
+The function takes a vector and a closure f that specifies how to transform 
+each element. This reduces duplication and allows for more 
+flexible transformations.
+```rust
+//using functions
+fn apply_to_elements<F>(v: &Vec<i32>, f: F) -> Vec<i32>
+where
+    F: Fn(i32) -> i32,
+{
+    v.iter().map(|&x| f(x)).collect()
+}
+
+//using structures
+struct Action<F>
+where
+    F: Fn(&mut Robot),
+{
+    description: String,
+    execute: F,
+}
+
+impl Robot {
+    fn perform_named_action<F>(&mut self, action: Action<F>)
+    where
+        F: Fn(&mut Robot),
+    {
+        println!("Performing action: {}", action.description);
+        (action.execute)(self);
+    }
+}
+```
+
+By default, closures borrow variables from their environment. 
+If you want a closure to take ownership of captured variables, 
+you can use the move keyword. This forces the closure to capture
+variables by value. The move keyword is particularly useful when
+passing closures to threads or asynchronous functions because 
+these contexts often require ownership.
+```rust
+let s = String::from("hello");
+
+let capture_move = move || {
+    println!("{}", s);  // `s` is moved into the closure
+};
+
+// `s` is no longer accessible here because it has been moved
+
+```
+## Iterators
+An iterator in Rust is any type that implements the Iterator 
+trait, which provides a way to sequentially access the elements
+of a collection or sequence.
+```rust
+    let numbers = vec![1, 2, 3, 4, 5];
+    let mut iter = numbers.iter();  // Creates an iterator over the vector
+
+    println!("{:?}", iter.next());  // Output: Some(1)
+    println!("{:?}", iter.next());  // Output: Some(2)
+```
+
+The primary method of the Iterator trait is next(). 
+Each call to next() yields the next item in the sequence, 
+returning None when the iteration is complete.
+The core trait is defined as,
+```rust
+pub trait Iterator {
+    type Item; // The type of elements being iterated over
+
+    // Returns the next element in the sequence, or `None` if iteration is finished
+    fn next(&mut self) -> Option<Self::Item>;
+
+    // Other methods are provided by default (like `map`, `filter`, `fold`, etc.)
+}
+```
+### implementing Iterator Adapters
+Iterators in Rust can be transformed and combined using 
+iterator adapters. 
+
+- **map()**: Transforms each element using a closure.
+    ```rust
+    let numbers = vec![1, 2, 3];
+    let doubled: Vec<i32> = numbers.iter().map(|x| x * 2).collect();
+    println!("{:?}", doubled);  // Output: [2, 4, 6]
+    ```
+
+- **filter()**: Filters elements based on a condition.
+    ```rust
+    let numbers = vec![1, 2, 3, 4, 5];
+    let evens: Vec<i32> = numbers.iter().filter(|&&x| x % 2 == 0).collect();
+    println!("{:?}", evens);  // Output: [2, 4]
+    ```
+
+- **enumerate()**: Adds an index to each element.
+    ```rust
+    let numbers = vec![10, 20, 30];
+    for (index, value) in numbers.iter().enumerate() {
+        println!("Index: {}, Value: {}", index, value);
+    }
+    ```
+
+- **fold()**: Reduces the elements to a single value by 
+    repeatedly applying a closure.
+    ```rust
+    let numbers = vec![1, 2, 3, 4];
+    let sum = numbers.iter().fold(0, |acc, &x| acc + x);
+    println!("{}", sum);  // Output: 10
+    ```
+
+### Implementing your own iterator
+
+```rust
+    struct EvenNumbers {
+        current: usize,
+        max: usize,
+    }
+
+    impl EvenNumbers {
+        fn new(max: usize) -> Self {
+            EvenNumbers { current: 0, max }
+        }
+    }
+
+    impl Iterator for EvenNumbers {
+        type Item = usize;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            if self.current >= self.max {
+                return None;
+            }
+            let even = self.current * 2;
+            self.current += 1;
+            Some(even)
+        }
+    }
+
+    fn main() {
+        let even_numbers = EvenNumbers::new(5);
+        for num in even_numbers {
+            println!("{}", num);  // Output: 0, 2, 4, 6, 8
+        }
+    }
+```
+
+## Publishing Rust Crates
+### Build profiles
+Cargo provides three predefined profiles:
+
+- **dev**: Used when you run ```cargo build```. It’s optimized for fast
+    compilation rather than runtime performance.
+    - No optimizations: The default optimization level is 0.
+    - Debug information: Debug information is included by default
+    - Fast rebuilds.
+
+- **release**: Used when you run ```cargo build --release```. It 
+    sacrifices compile time for runtime performance.
+    - Full optimizations: The default optimization level is 3, 
+    which provides maximum optimizations.
+    - Minimal debug information: Debug information is usually 
+    disabled or minimal.
+    - Link Time Optimization (LTO): Disabled by default, but can
+    be enabled for further optimizations at the cost of slower 
+    build times.
+
+-  **test**: This profile is automatically used when you run 
+    ```cargo test```. It’s similar to the dev profile, but can 
+    be customized specifically for testing.
+
+### Customizing Build profiles
+You can override or customize these profiles in your 
+project’s Cargo.toml file under the ```[profile.*]``` sections.
+
+```toml
+[profile.dev]
+opt-level = 1      # Enable minimal optimization for faster runtime performance
+debug = true       # Keep debug symbols for development
+lto = false        # LTO is not necessary for development
+overflow-checks = true   # Enable overflow checks during development
+
+[profile.release]
+opt-level = 3      # Maximize runtime performance
+debug = false      # Disable debug information for smaller binary size
+lto = true         # Enable Link Time Optimization for better performance
+panic = 'abort'    # Panic behavior set to 'abort' to reduce binary size
+
+```
+
+### Documentation comments
+In Rust, documentation comments are special types of comments 
+used to generate API documentation for your code. 
+***Rust's documentation comments support Markdown formatting.***
+
+To generate the documentation, use the following command:
+```cargo doc --open```
+```cargo doc```: Generates documentation for your crate.
+```--open```: Automatically opens the generated documentation in your web browser.
+
+The generated documentation includes all items documented using
+/// and //!, and it will be rendered as HTML.
+
+Types :
+-  **Line Documentation Comments (///)** :
+    These are placed just above the item (such as a function, 
+    struct, or module) they document.
+    ```rust
+    /// Adds two numbers together.
+    ///
+    /// # Arguments
+    /// * `a` - The first number.
+    /// * `b` - The second number.
+    ///
+    /// # Example
+    /// ```
+    /// let result = add(2, 3);
+    /// assert_eq!(result, 5);
+    /// ```
+    fn add(a: i32, b: i32) -> i32 {
+        a + b
+    }
+    ```
+
+- **Inner Documentation Comments (//!)** :
+    Inner documentation comments are typically used to document 
+    entire crates, modules, or files. They are placed inside a 
+    module or crate and usually at the top of the file.
+    //! This is the main module of the application.
+//! It contains the primary logic for starting the application.
+    ```rust
+        mod app {
+            //! This module handles application-specific logic.
+            //!
+            //! It contains helper functions for managing state and control flow.
+        }
+    ```
+
+#### Sections in Documentation
+- Example: Shows an example of how to use the item.
+    ```rust
+    /// # Example
+    /// ```
+    /// let result = add(5, 10);
+    /// assert_eq!(result, 15);
+    /// ```
+    ```
+- Arguments: Lists the arguments the function takes, often with a brief explanation.
+    ```rust
+    /// # Arguments
+    /// * `a` - The first number.
+    /// * `b` - The second number.
+    ```
+- Panics: Describes situations where the function might panic.
+    ```rust
+    /// # Panics
+    /// This function will panic if the denominator is zero.
+    ```
+- Errors: Describes the errors that might be returned by the function.
+    ```rust
+    /// # Errors
+    /// Returns an error if the file cannot be opened.
+    ```
+- Safety: For unsafe functions, this section should explain the conditions under which the function is safe to call.
+    ```rust
+    /// # Safety
+    /// The caller must ensure that the provided pointer is valid.
+    ```
+
+
+> Sometimes, you want to expose part of your API in a simpler way by re-exporting modules, types, or functions. This is especially useful for larger crates where you want users to access common functionality without going deep into module hierarchies.
+```
+// Re-exporting the entire math module under the root.
+pub use crate::math;
+```
+> Now, users can access add and multiply directly from the crate root:
+```rust
+// Before:
+use my_crate::math::add;
+
+// After:
+use my_crate::add;
+
+```
+#### Running Tests in Documentation
+Rust’s rustdoc allows you to write code examples inside your 
+documentation comments and automatically test them.
+```
+cargo test
+```
+
+### Step-by-Step Guide to Publishing a Crate on Crates.io
+
+1. **Log into crates.io with GitHub:**
+   - Go to [crates.io](https://crates.io) and sign in using your GitHub account.
+
+2. **Generate a New API Token:**
+   - Once logged in, click the drop-down menu next to your profile icon and go to **Account Settings**.
+   - Scroll down to the **API Access** section and select **New Token**.
+   - Assign a name to the token (e.g., "crate publishing token") and click **Create**.
+   - This generates a login token. **Copy the token**.
+
+3. **Log in to Cargo:**
+   - Open your terminal and use the following command to log in:
+     ```bash
+     cargo login <your-token>
+     ```
+   - Replace `<your-token>` with the token you copied from crates.io.
+   - If the login is successful, you are now ready to publish your crate.
+
+4. **Prepare Your Crate for Publishing:**
+   - Open your `Cargo.toml` file and verify the metadata.
+     - Ensure the crate **name** is unique (it must not conflict with any existing crate name on crates.io).
+     - Add a **description** and **license** to your crate.
+     - Make sure your **email address is verified** on crates.io.
+
+5. **Commit All Files to Git:**
+   - Ensure all relevant project files are committed to Git. This step is important if you plan to maintain version control.
+
+6. **Publish the Crate:**
+   - Once everything is set up, you can publish your crate using the following command:
+     ```bash
+     cargo publish
+     ```
+   - This uploads your crate to crates.io.
+
+7. **Publish New Versions of Your Crate:**
+   - When you want to release a new version, update the version number in your `Cargo.toml` (according to semantic versioning).
+   - Run:
+     ```bash
+     cargo publish
+     ```
+   - This publishes the updated version of your crate.
+
+8. **Deprecating a Version (Yank):**
+   - If you want to prevent a specific version of your crate from being downloaded (but still keep it in history), you can use the **yank** command:
+     ```bash
+     cargo yank --vers 0.1.0
+     ```
+   - To undo this action, you can run:
+     ```bash
+     cargo yank --vers 0.1.0 --undo
+     ```
