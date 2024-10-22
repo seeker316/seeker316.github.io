@@ -1823,8 +1823,8 @@ use my_crate::math::add;
 use my_crate::add;
 
 ```
-#### Running Tests in Documentation
-Rust’s rustdoc allows you to write code examples inside your 
+
+> Running Tests in Documentation : Rust’s rustdoc allows you to write code examples inside your 
 documentation comments and automatically test them.
 ```
 cargo test
