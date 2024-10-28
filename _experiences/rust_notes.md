@@ -1825,7 +1825,6 @@ Types :
 
 > Running Tests in Documentation : Rust’s rustdoc allows you to write code examples inside your 
 documentation comments and automatically test them.
-
 ```shell
     cargo test
 ```
@@ -1882,3 +1881,401 @@ documentation comments and automatically test them.
      ```bash
      cargo yank --vers 0.1.0 --undo
      ```
+
+## Cargo Workspaces
+
+
+ChatGPT said:
+ChatGPT
+Cargo workspaces in Rust are a powerful feature that allows you to manage multiple related packages (crates) within a single repository. This feature is particularly useful for projects that consist of several interdependent crates, as it simplifies dependency management and enhances project organization. 
+
+Packages (crates) in a cargo workspace share the same Cargo.lock file and output directory.The root of the workspace contains a ````Cargo.toml``` file that specifies the workspace members. 
+
+```toml
+    [workspace]
+    members = [
+        "crate_a",
+        "crate_b",
+        "crate_c",
+    ]
+```
+
+Each crate (package) in a workspace has its own Cargo.toml file, which defines its metadata, dependencies, and settings.
+```bash
+    my_workspace/
+    ├── Cargo.toml      # Workspace manifest
+    ├── crate_a/
+    │   └── Cargo.toml  # Crate A manifest
+    ├── crate_b/
+    │   └── Cargo.toml  # Crate B manifest
+    └── crate_c/
+        └── Cargo.toml  # Crate C manifest
+
+```
+
+When developing interdependent crates, you can use relative paths in the dependencies. For example, if crate_b depends on crate_a, you can specify it like this in crate_b/Cargo.toml:
+```toml
+    [dependencies]
+    crate_a = { path = "../crate_a" }
+```
+ You can run a specific crate by navigating to its directory and using ```cargo run```.
+ ```toml
+cargo run -p crate_a
+ ```
+
+ ### Installing binaries from crates.io
+One can only install packages which have a binary target.
+Packages can have binary and library targets.
+```bash
+cargo install ripgrep
+```
+All binaries installed with cargo install are stored in the installation routes bin directory. 
+```bash
+~/.cargo/bin/<binary_name>
+```
+You can run it with ```~/.cargo/bin/rg```
+
+To run installed binaries without specifying the full path, you can add Cargo's bin directory to your PATH
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+To apply changes ```source ~/.bashrc```
+
+To update all installed binaries
+```bash
+cargo install-update -a
+```
+To uninstall a binary
+```bash
+cargo uninstall <crate_name>
+```
+## Smart Pointers
+
+Smart pointers in Rust are advanced data types that manage memory and provide additional features beyond regular pointers. Unlike standard pointers, smart pointers automatically handle memory allocation and deallocation, helping prevent memory leaks and ensuring safety. 
+
+### Box Pointers
+Box pointers (commonly referred to simply as "boxes") are a smart pointer type that enables heap allocation of values. They provide a way to create a single ownership model, ensuring that the data they point to has a unique owner. 
+```rust
+let b = Box::new(5); // `b` is a Box containing an integer
+```
+**Using boxes for making a linked list**
+```rust
+enum List {
+    // `Cons` variant holds an integer and a boxed pointer to the next List element.
+    Cons(i32, Box<List>),
+    // `Nil` variant represents the end of the list (an empty list).
+    Nil,
+}
+// Import the `Cons` and `Nil` variants for easier access.
+use List::{Cons, Nil};
+// Main function where the execution starts.
+fn main() {
+    // Create a linked list: 1 -> 2 -> 3 -> Nil
+    let list: List = Cons(1,Box::new(Cons(2,Box::new(Cons(3, Box::new(Nil))))));
+}
+```
+### Deref Trait
+The ```Deref``` trait in Rust allows smart pointers (or other types) to behave like regular references by overloading the dereference operator (*). The Deref trait allows types like ```Box<T>, Rc<T>, Arc<T>```, and even user-defined types to behave like references. The Deref trait defines how the * operator behaves when applied to a smart pointer. It converts a smart pointer into a reference to the inner type (T) so you can access the data it points to as if it were a regular reference.
+
+```rust
+    pub trait Deref {
+        type Target: ?Sized;  // The type that this smart pointer dereferences to
+        fn deref(&self) -> &Self::Target;
+    }
+
+    let x = Box::new(5);
+    println!("{}", *x); // Dereferences the Box to get the value 5
+```
+
+Rust has a feature called ```deref coercion``` that automatically converts a smart pointer into a reference when needed. For example, if a function expects a &str (a reference to a string slice) but you pass it a String, Rust will automatically call deref() to convert the String into a &str.
+```rust
+fn takes_str(s: &str) {
+    println!("String slice: {}", s);
+}
+fn main() {
+    let my_string = String::from("Hello, Rust!");
+    takes_str(&my_string);
+}
+```
+**Custom Deref Implementation**
+```rust
+use std::ops::Deref;
+
+// Define a custom smart pointer.
+struct MyBox<T>(T);
+
+// Implement the `Deref` trait for `MyBox<T>`.
+impl<T> Deref for MyBox<T> {
+    type Target = T;  // The inner value is of type `T`
+    fn deref(&self) -> &T {
+        &self.0  // Return a reference to the inner value
+    }
+}
+
+fn main() {
+    let x = 5;
+    let y = MyBox(x);
+    // Using dereference (`*`) operator to access the value inside `MyBox`.
+    println!("y = {}", *y);  // Deref to get the value 5
+}
+```
+**DerefMut**: This is the mutable version of Deref. It allows mutable dereferencing, letting you modify the inner value.
+
+```rust
+use std::ops::{Deref, DerefMut};
+
+// Define the same custom smart pointer `MyBox`.
+struct MyBox<T>(T);
+
+// Implement the `Deref` trait for `MyBox<T>`.
+impl<T> Deref for MyBox<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        &self.0
+    }
+}
+
+// Implement the `DerefMut` trait for `MyBox<T>`.
+impl<T> DerefMut for MyBox<T> {
+    fn deref_mut(&mut self) -> &mut T {
+        &mut self.0
+    }
+}
+
+fn main() {
+    let mut x = MyBox(5);
+    *x = 10;  // Mutably dereference `MyBox` to change the inner value.
+    println!("x = {}", *x);  // Output: x = 10
+}
+
+```
+
+### Drop Trait
+The Drop trait in Rust is used to define custom behavior when a value goes out of scope. It's essentially Rust’s mechanism for performing cleanup when an object is no longer needed. This method is automatically called when the object goes out of scope, and you can customize it to perform specific cleanup tasks. 
+```rust
+struct CustomSmartPointer {
+    data: String,
+}
+
+// Implement the Drop trait for CustomSmartPointer
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("Dropping CustomSmartPointer with data: `{}`", self.data);
+    }
+}
+
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("my stuff"),
+    };
+
+    let d = CustomSmartPointer {
+        data: String::from("other stuff"),
+    };
+
+    // When `c` and `d` go out of scope at the end of `main`, their `drop` methods are called automatically.
+    println!("CustomSmartPointers created.");
+}
+
+```
+You don’t need to explicitly call the drop method. Rust automatically calls drop for any object when it goes out of scope.
+If you need to drop a value early (before the end of its scope), you can use the std::mem::drop function:
+```rust
+    let c = CustomSmartPointer {
+    data: String::from("some data"),
+    };
+    println!("Dropping `c` early...");
+    drop(c);  // Calls the `drop` method immediately
+    println!("`c` has been dropped.");
+```
+
+### Reference Counting
+In Rust, reference counting is a way to manage memory for data that can have multiple owners.
+
+**Rc<T> (Reference Counted)**: This smart pointer is used for single-threaded scenarios where multiple parts of the program need to own and share access to the same data. It keeps track of the number of references to a piece of data and automatically cleans up when no references remain.
+
+**Arc<T> (Atomic Reference Counted)**: Similar to Rc, but thread-safe for concurrent access. Arc uses atomic operations to safely update the reference count across threads, making it suitable for multi-threaded scenarios.
+
+1. When you create a new Rc<T> or Arc<T> instance, Rust initializes a reference count set to 1.
+2. Every time you clone an Rc or Arc, the reference count is incremented, reflecting that there is now an additional owner.
+3. When an Rc or Arc goes out of scope (or is dropped), Rust automatically decrements the count.
+4. Once the count reaches zero, Rust knows no one is using the data anymore, so it cleans up the memory.
+
+```rust
+use std::rc::Rc;
+
+fn main() {
+    let a = Rc::new(5);
+    println!("Reference count after creating a: {}", Rc::strong_count(&a)); // 1
+
+    let b = Rc::clone(&a);
+    println!("Reference count after cloning a into b: {}", Rc::strong_count(&a)); // 2
+
+    {
+        let c = Rc::clone(&a);
+        println!("Reference count after cloning a into c: {}", Rc::strong_count(&a)); // 3
+    }
+
+    // `c` goes out of scope here
+    println!("Reference count after c goes out of scope: {}", Rc::strong_count(&a)); // 2
+}
+
+```
+
+### Interior Mutability
+Interior Mutability is a concept in Rust that allows modifying data even when there are immutable references to it. This pattern is essential when working with certain Rust smart pointers because Rust’s strict ownership model typically prevents mutating data through shared references (&T). However, with interior mutability, you can work around this by using specific smart pointers that enable mutation while upholding Rust’s guarantees.
+
+**Rust provides three primary smart pointers that implement interior mutability:**
+
+1. **Cell<T>** allows for copy-type values (values that implement the Copy trait) to be modified even when they’re accessed through an immutable reference.It achieves this by moving values in and out of the cell rather than returning references to the data directly, making it more restrictive in what data it can store. Cell<T> does not allow borrowing its contents; instead, you replace (set) and retrieve (get) the values directly, which works because Copy types can be duplicated trivially. 
+
+```rust
+use std::cell::Cell;
+
+fn main() {
+    let data = Cell::new(10);
+    
+    data.set(20); // Modify through an immutable reference
+    println!("The value is: {}", data.get());
+}
+```
+
+2. **RefCell<T>** is used for single-threaded scenarios and allows mutable access to its content through runtime borrow checking. While Rust enforces borrowing rules at compile-time, RefCell enforces borrowing at runtime. This means RefCell allows:
+Multiple immutable borrows.
+A single mutable borrow.
+But it panics at runtime if these rules are violated.
+
+```rust
+use std::cell::RefCell;
+
+fn main() {
+    let data = RefCell::new(vec![1, 2, 3]);
+
+    // Borrow as immutable (can have multiple immutable borrows)
+    let borrowed_data = data.borrow();
+    println!("Data: {:?}", *borrowed_data);
+
+    // Mutable borrow (only one mutable borrow allowed)
+    data.borrow_mut().push(4); // Modifies through an immutable reference to `data`
+    println!("Data after mutation: {:?}", *data.borrow());
+}
+```
+
+3. **Mutex<T> and RwLock<T>** allow for interior mutability with thread safety for multithreaded scenarios.
+    
+    - **Mutex<T>:** Provides exclusive, safe access to the data. It only allows one thread to access the data at a time by locking the data, blocking other threads until the lock is released.
+
+    - **RwLock<T>:** Allows multiple readers or a single writer. This is beneficial when you have a high number of read operations compared to write operations.
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let data = Arc::new(Mutex::new(5));
+
+    let handles: Vec<_> = (0..10).map(|_| {
+        let data = Arc::clone(&data);
+        thread::spawn(move || {
+            let mut num = data.lock().unwrap();
+            *num += 1; // Safely modify through the lock
+        })
+    }).collect();
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *data.lock().unwrap());
+}
+```
+
+### Reference Cycles
+Reference cycles occur when two or more values refer to each other in a circular way, preventing Rust from being able to clean up the memory they occupy. This problem primarily arises with reference-counted smart pointers like Rc and Arc, which manage memory by counting references. When reference cycles form, the reference count never drops to zero, resulting in a memory leak since the cycle of references prevents the data from being deallocated.
+
+*Example*
+- We have two structs, Node and Edge. Each Node can have a reference to another Node (say in a linked list structure).
+- Using Rc<T> enables nodes to have multiple owners (e.g., shared references in the graph).
+- However, if one node points back to another in a cycle, the reference count never reaches zero.
+- node1 and node2 each hold a reference to each other, creating a reference cycle. Since each Rc has a reference count of at least 1 due to the cycle, Rust’s memory cleanup (i.e., drop check) never gets triggered for these nodes, resulting in a memory leak.
+
+```rust
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    next: Option<Rc<RefCell<Node>>>,
+}
+
+fn main() {
+    let node1 = Rc::new(RefCell::new(Node {
+        value: 1,
+        next: None,
+    }));
+
+    let node2 = Rc::new(RefCell::new(Node {
+        value: 2,
+        next: Some(node1.clone()), // node2 points to node1
+    }));
+
+    node1.borrow_mut().next = Some(node2.clone()); // node1 points back to node2, creating a cycle
+
+    // Check reference counts
+    println!("node1 ref count: {}", Rc::strong_count(&node1)); // 2
+    println!("node2 ref count: {}", Rc::strong_count(&node2)); // 2
+
+    // At this point, both node1 and node2 have reference counts > 0, creating a cycle
+}
+
+```
+
+To avoid reference cycles, Rust provides ```Weak<T>```, a version of Rc that does not increase the reference count. A Weak reference allows access to the data without taking ownership, thereby preventing cycles.
+A Weak reference can be created from an Rc by calling ```.downgrade()```. Unlike Rc, Weak does not increment the reference count. Thus, the value can be cleaned up when all Rc references are gone, even if Weak references still exist. To access the data, Weak pointers need to be upgraded to Rc. This operation is fallible and returns None if the data has already been deallocated.
+
+```rust
+use std::cell::RefCell;
+use std::rc::{Rc, Weak};
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    next: Option<Rc<RefCell<Node>>>,
+    prev: Option<Weak<RefCell<Node>>>, // Use Weak to avoid cycles
+}
+
+fn main() {
+    let node1 = Rc::new(RefCell::new(Node {
+        value: 1,
+        next: None,
+        prev: None,
+    }));
+
+    let node2 = Rc::new(RefCell::new(Node {
+        value: 2,
+        next: Some(node1.clone()),
+        prev: None,
+    }));
+
+    node1.borrow_mut().prev = Some(Rc::downgrade(&node2)); // node1 has a weak reference to node2
+
+    // Check reference counts
+    println!("node1 strong count: {}", Rc::strong_count(&node1)); // 1
+    println!("node1 weak count: {}", Rc::weak_count(&node1)); // 1
+
+    println!("node2 strong count: {}", Rc::strong_count(&node2)); // 1
+    println!("node2 weak count: {}", Rc::weak_count(&node2)); // 0
+
+    // Now, even though node1 and node2 reference each other, node1's weak reference to node2
+    // prevents a cycle, so memory can be cleaned up when strong counts drop to zero.
+}
+```
+
+```node1``` and ```node2``` still reference each other, but node1’s reference to node2 is a Weak reference.
+Since Weak does not increment the reference count, Rust can deallocate the nodes once the Rc counts drop to zero, preventing a memory leak.
+
+> Strong Count: Counts the number of owning references (Rc or Arc clones) to the data. When the strong count reaches zero, the data is deallocated.
+
+> Weak Count: Counts the number of non-owning references (Weak<T>) to the data. Weak references do not prevent deallocation. If only weak references remain (and the strong count is zero), the data is dropped, but the Weak pointers can still exist, they just won’t be able to access the data.
