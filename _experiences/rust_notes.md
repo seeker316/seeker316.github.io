@@ -2279,3 +2279,238 @@ Since Weak does not increment the reference count, Rust can deallocate the nodes
 > Strong Count: Counts the number of owning references (Rc or Arc clones) to the data. When the strong count reaches zero, the data is deallocated.
 
 > Weak Count: Counts the number of non-owning references (Weak<T>) to the data. Weak references do not prevent deallocation. If only weak references remain (and the strong count is zero), the data is dropped, but the Weak pointers can still exist, they just won’t be able to access the data.
+
+## Concurrency
+Different approaches to implementing concurrency in programming languages and operating systems:
+
+**Green Threads**:
+- Green threads are managed by a runtime or virtual machine (like a language's standard library) rather than the operating system.
+They allow multiple threads to run within a single OS thread and are scheduled by the language runtime.
+- They're lightweight and can switch context faster, making them efficient for tasks that frequently yield control (like I/O-bound operations).
+- They don’t fully utilize multicore systems since they're limited to a single OS thread.
+
+**1-to-1 Thread Mapping**:
+- In this model, each user thread is mapped to a separate OS thread. Threads are managed and scheduled by the OS, meaning they can run in parallel on multiple cores, taking full advantage of multicore processors.
+- True parallelism is achieved, and the OS handles scheduling, balancing threads across cores.
+- OS threads are heavier, with more overhead on context switching and memory usage.
+
+Rust’s standard library offers a ```std::thread``` module to spawn and manage threads. The ```thread::spawn``` function creates a new thread and runs a given closure on it. The main thread can wait for other threads to finish by calling ```.join()```, which blocks the main thread until the spawned thread completes.
+
+```rust
+    use std::thread;
+
+    let handle = thread::spawn(|| {
+        println!("Hello from a new thread!");
+    });
+
+    handle.join().unwrap();  // Wait for the thread to finish
+
+```
+In this example, the ```handle.join().unwrap()``` call blocks the main thread until the spawned thread completes. This way, the main thread can synchronize and wait for all threads to finish before proceeding.
+
+```rust
+    use std::thread;
+
+    fn main() {
+        let handle = thread::spawn(|| {
+            println!("Hello from the spawned thread!");
+        });
+
+        // The main thread waits here for the spawned thread to finish
+        handle.join().unwrap(); 
+        println!("Spawned thread has completed.");
+    }
+
+```
+
+A ```move closure``` is a type of closure that captures variables from its environment by moving them into the closure rather than borrowing them. This is useful when you’re spawning threads, as Rust’s ownership model enforces strict rules about borrowing across threads. The ```drop``` function is used to manually release resources or perform cleanup operations when an object goes out of scope. 
+
+```rust
+    use std::thread;
+use std::mem::drop;
+
+fn main() {
+    let mut handles = vec![];
+
+    for i in 0..5 {
+        // Each thread gets its own `i` value, so we use `move` to capture `i` by value
+        let handle = thread::spawn(move || {
+            println!("Thread {} started", i);
+
+            // Explicitly drop `i` after using it
+            drop(i);
+            println!("Thread has dropped its value.");
+
+            println!("Thread completed.");
+        });
+
+        // Push each handle to the vector
+        handles.push(handle);
+    }
+
+    // Join all threads to ensure they complete before the main thread exits
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("All threads have completed.");
+}
+```
+### Message Passing
+
+Message passing is a concurrency model where threads communicate by sending messages to each other, rather than sharing memory. Rust implements message passing using channels provided by the std::sync::mpsc (multiple producer, single consumer) module. A channel can have multiple senders, but only one receiver by default. This setup is called multiple producer, single consumer (mpsc). Channels are a safe and efficient way to exchange data between threads.
+
+```rust
+    use std::sync::mpsc;
+    use std::thread;
+    use std::time::Duration;
+
+    fn main() {
+        let (tx, rx) = mpsc::channel();
+
+        // Spawn a thread to send multiple messages
+        thread::spawn(move || {
+            let messages = vec!["Hello", "from", "the", "thread"];
+            for msg in messages {
+                tx.send(msg).unwrap();
+                thread::sleep(Duration::from_millis(500));
+            }
+        });
+
+        // Main thread receives each message as it becomes available
+        for received in rx {
+            println!("Received: {}", received);
+        }
+    }
+
+```
+Using multiple threads to send messages to a single receiver by cloning the sender. Each cloned sender acts as a new independent sender that shares access to the same channel.
+
+```rust
+    
+    use std::sync::mpsc;
+    use std::thread;
+
+    fn main() {
+        let (tx, rx) = mpsc::channel();
+
+        for i in 0..5 {
+            let tx = tx.clone();  // Clone the sender for each thread
+            thread::spawn(move || {
+                tx.send(format!("Message from thread {}", i)).unwrap();
+            });
+        }
+
+        // Receiving messages from all threads
+        for received in rx {
+            println!("Received: {}", received);
+        }
+    }
+```
+
+Few essential methods for channels in Rust:
+- **send()**: Sends data from the sender to the receiver. It returns a Result that indicates whether the message was sent successfully.
+- **recv()**: Blocks until a message is received and returns a Result.
+- **try_recv()**: Non-blocking version of recv(). It immediately returns a Result, either with a message or with an error if there’s no message.
+- **iter()**: Allows iterating over the receiver until the channel is closed. This is useful for loops that read all available messages until all senders go out of scope.
+
+### Sharing state
+
+Sharing state between threads allows multiple threads to access or modify common data. Rust provides smart pointers and synchronization primitives like Arc and Mutex to safely share data in a multithreaded context. Rust’s ownership model enforces that each piece of data can only have one owner at a time. When sharing data between threads, Rust requires either.
+
+**Arc (atomic reference counting)** is a thread-safe version of Rc (reference counting). Arc enables multiple threads to share ownership of data, and it keeps track of how many owners (references) there are. When the last reference goes out of scope, Arc cleans up the data. ```Arc: Arc::clone(&shared_data)``` increases the reference count. Each thread can then access the data in a read-only fashion since the vector is immutable.
+``` rust
+    use std::sync::Arc;
+    use std::thread;
+
+    fn main() {
+        let shared_data = Arc::new(vec![1, 2, 3, 4, 5]);
+
+        let mut handles = vec![];
+
+        for _ in 0..3 {
+            let shared_data = Arc::clone(&shared_data); // Clone an Arc pointer for each thread
+
+            let handle = thread::spawn(move || {
+                println!("{:?}", shared_data);
+            });
+
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            handle.join().unwrap();
+        }
+    }
+
+```
+
+
+**Mutex** provides mutual exclusion, meaning it allows only one thread at a time to access or modify the data it protects. By wrapping data in a Mutex, you ensure that only one thread can lock and access the data at a time, preventing race conditions.
+
+Here ```Arc``` enables multiple threads to own the same ```Mutex```. Each thread can clone the Arc to get a new reference. ```counter.lock().unwrap()``` acquires the lock. If another thread holds the lock, ```lock()``` blocks until it is released. After locking, the thread has exclusive access to the data, allowing it to modify the counter safely.
+
+``` rust
+    use std::sync::{Arc, Mutex};
+    use std::thread;
+
+    fn main() {
+        let counter = Arc::new(Mutex::new(0)); // Shared, thread-safe counter
+
+        let mut handles = vec![];
+
+        for _ in 0..10 {
+            let counter = Arc::clone(&counter); // Clone `Arc` for each thread
+
+            let handle = thread::spawn(move || {
+                let mut num = counter.lock().unwrap(); // Lock `Mutex` to get exclusive access
+                *num += 1; // Safely increment counter
+            });
+
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            handle.join().unwrap();
+        }
+
+        println!("Result: {}", *counter.lock().unwrap());
+    }
+```
+
+**RwLock (Read-Write Lock)** allows multiple readers or one writer. This is useful when you want more flexibility than Mutex for read-heavy workloads.
+    - Readers: Multiple threads can read the data concurrently if no writer holds the lock.
+    - Writer: Only one thread can write, and it will block other readers and writers until it finishes.
+
+```rust
+    use std::sync::{Arc, RwLock};
+    use std::thread;
+
+    fn main() {
+        let data = Arc::new(RwLock::new(vec![1, 2, 3]));
+
+        let data_reader = Arc::clone(&data);
+        let reader_handle = thread::spawn(move || {
+            let data = data_reader.read().unwrap();
+            println!("Read data: {:?}", *data);
+        });
+
+        let data_writer = Arc::clone(&data);
+        let writer_handle = thread::spawn(move || {
+            let mut data = data_writer.write().unwrap();
+            data.push(4);
+            println!("Updated data: {:?}", *data);
+        });
+
+        reader_handle.join().unwrap();
+        writer_handle.join().unwrap();
+    }
+```
+
+**Handling Deadlocks and Poisoned Locks**
+Rust’s locks (Mutex and RwLock) can be poisoned if a thread panics while holding the lock, leaving it in an unusable state. When a lock is poisoned, lock() or read()/write() return a Result::Err, indicating the lock’s state might be inconsistent. You can recover from this by handling the error and reinitializing the data if needed.  Deadlocks can occur if multiple threads wait on each other’s locks. 
+
+To avoid deadlocks:
+- Only lock what’s necessary and release locks as soon as possible. 
+- Avoid holding multiple locks in inconsistent order across threads.
+
