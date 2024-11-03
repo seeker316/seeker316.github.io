@@ -3118,8 +3118,7 @@ fn main() {
 ### Extern
 The ```extern``` keyword is used to define an interface for interacting with foreign (non-Rust) code, primarily when working with C libraries or other languages. It allows Rust programs to call functions and use data types defined in other programming languages. Calling external functions requires unsafe blocks, as the Rust compiler cannot guarantee the safety of operations performed through foreign interfaces.
 
-1. **Extern Functions**
-When you want to call functions from an external library, you declare them using the extern keyword.  
+1. **Extern Functions** : When you want to call functions from an external library, you declare them using the extern keyword.  
 
 ```rust
 extern "C" {
@@ -3134,7 +3133,9 @@ fn main() {
 }
 
 ```
+
 You can group multiple external function declarations within an extern block for better organization:
+
 ```rust
 extern "C" {
     fn c_function_one(x: i32) -> i32;
@@ -3142,7 +3143,7 @@ extern "C" {
 }
 ```
 2. **FFI (Foreign Function Interface)**
-extern is primarily used in the context of FFI, which allows Rust to call functions and use data types defined in other languages, particularly C.
+    extern is primarily used in the context of FFI, which allows Rust to call functions and use data types defined in other languages, particularly C.
 ```C 
 // c_library.c
 #include <stdio.h>
@@ -3168,7 +3169,8 @@ fn main() {
 
 ```
 3. **Extern Crates and Extern Types**
-The extern keyword is also used to declare external crates in Rust, which are libraries published on crates.io.
+    The extern keyword is also used to declare external crates in Rust, which are libraries published on crates.io.
+
 ```rust
 extern crate serde; // Declare an external crate
 
@@ -3180,6 +3182,7 @@ fn main() {
 ```
 
 You can also declare types that are defined externally, typically used in FFI contexts.
+
 ```rust
 extern {
     type ExternalType; // Declare an external type
