@@ -3144,6 +3144,7 @@ extern "C" {
 ```
 2. **FFI (Foreign Function Interface)**
     extern is primarily used in the context of FFI, which allows Rust to call functions and use data types defined in other languages, particularly C.
+
 ```C 
 // c_library.c
 #include <stdio.h>
@@ -3152,7 +3153,10 @@ int add(int a, int b) {
     return a + b;
 }
 ```
+
 You can call this function from Rust like this:
+
+
 ```rust
 // main.rs
 #[link(name = "c_library")] // Link with the C library
