@@ -3159,7 +3159,6 @@ You can call this function from Rust like this:
 
 
 ```rust
-// main.rs
 #[link(name = "c_library")] // Link with the C library
 extern "C" {
     fn add(a: i32, b: i32) -> i32; // Declare the C function
