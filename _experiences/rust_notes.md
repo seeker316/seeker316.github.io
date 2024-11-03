@@ -2514,3 +2514,674 @@ To avoid deadlocks:
 - Only lock what’s necessary and release locks as soon as possible. 
 - Avoid holding multiple locks in inconsistent order across threads.
 
+## Object Oriented Programming
+
+Object-Oriented Programming (OOP) in Rust might seem unconventional at first glance since Rust doesn’t have traditional classes, inheritance, or some of the mechanisms seen in languages like C++ or Java. However, Rust provides powerful abstractions to achieve the core principles of OOP — encapsulation, polymorphism, and inheritance 
+
+### Encapsulation 
+In OOP, encapsulation means bundling data (fields) and methods that operate on the data into a single unit. In Rust, encapsulation is achieved through structs and impl blocks:
+**Structs** : Structs can be public or private, public structs expose their fields (attributes), while private structs limit access.
+**Impl Blocka** : Implementation blocks help define functions (including constructors) that operate on the data within a struct.
+``` rust
+    // Defining a struct with private fields
+    pub struct Rectangle {
+        width: u32,
+        height: u32,
+    }
+
+    // Associated methods (impl block) for Rectangle struct
+    impl Rectangle {
+        // Constructor method for Rectangle
+        pub fn new(width: u32, height: u32) -> Self {
+            Self { width, height }
+        }
+
+        // Public method that computes the area
+        pub fn area(&self) -> u32 {
+            self.width * self.height
+        }
+
+        // Getter for width, demonstrates controlled access
+        pub fn width(&self) -> u32 {
+            self.width
+        }
+    }
+
+```
+
+### Polymorphism 
+Rust achieves polymorphism (the ability for different types to be used interchangeably) through traits. Trait objects enable dynamic dispatch for trait-based polymorphism. This allows you to write code that can operate on different types that implement a specific trait without knowing those types at compile time.  Unlike regular trait implementations, which use static dispatch (resolved at compile time), trait objects defer method selection until runtime, making them particularly useful when you need a collection of different types that share a common behavior.
+
+``` rust
+// Define a trait named Drawable with a single method `draw`
+trait Drawable {
+    fn draw(&self); // `draw` method to be implemented by any type that wants to be "Drawable"
+}
+
+// Define a struct `Circle` with a `radius` field
+struct Circle {
+    radius: f64,
+}
+
+// Define a struct `Square` with a `side` field
+struct Square {
+    side: f64,
+}
+
+// Implement the `Drawable` trait for the `Circle` struct
+impl Drawable for Circle {
+    fn draw(&self) {
+        // Method prints a message specific to Circle
+        println!("Drawing a circle with radius {}", self.radius);
+    }
+}
+
+// Implement the `Drawable` trait for the `Square` struct
+impl Drawable for Square {
+    fn draw(&self) {
+        // Method prints a message specific to Square
+        println!("Drawing a square with side {}", self.side);
+    }
+}
+```
+**Using Trait Objects in Collections**
+```rust
+    fn main() {
+    // Create a vector `shapes` to hold different types that implement `Drawable`
+    // `Box<dyn Drawable>` is a trait object, allowing for dynamic dispatch
+    let shapes: Vec<Box<dyn Drawable>> = vec![
+        Box::new(Circle { radius: 5.0 }), // Boxed Circle stored as `Box<dyn Drawable>`
+        Box::new(Square { side: 3.0 }),   // Boxed Square stored as `Box<dyn Drawable>`
+    ];
+
+    // Iterate over each shape in the `shapes` vector
+    for shape in shapes {
+        // Call the `draw` method on each shape
+        // Dynamic dispatch occurs here, as Rust determines at runtime
+        // which `draw` method (Circle's or Square's) to call
+        shape.draw();
+    }
+}
+```
+### Inheritance 
+Rust doesn't support inheritance directly, favoring composition and traits instead. 
+**Composition** : Instead of subclassing, you can use composition by including instances of other structs or types as fields within a struct.
+
+``` rust
+    struct Display {
+        width: u32,
+        height: u32,
+    }
+
+    struct Screen {
+        display: Display,  // Composing Screen with Display
+        brightness: u8,
+    }
+```
+
+**Trait Bounds and Trait Inheritance** : Rust enables a form of "inheritance" through trait bounds and trait inheritance. Traits can depend on other traits, allowing the creation of more complex behaviors.
+
+```rust
+// Define a base trait
+trait Drawable {
+    fn draw(&self);
+}
+
+// Define a trait that extends Drawable
+trait Movable: Drawable {
+    fn move_by(&mut self, x: i32, y: i32);
+}
+
+struct Player {
+    x: i32,
+    y: i32,
+}
+
+impl Drawable for Player {
+    fn draw(&self) {
+        println!("Drawing player at ({}, {})", self.x, self.y);
+    }
+}
+
+impl Movable for Player {
+    fn move_by(&mut self, x: i32, y: i32) {
+        self.x += x;
+        self.y += y;
+    }
+}
+
+```
+### Static and Dynamic dispatch
+Dispatch refers to the process of determining which function to call when a method is invoked. Rust supports two main types of dispatch: static dispatch (or compile-time dispatch) and dynamic dispatch (or runtime dispatch).
+
+| Feature             | Static Dispatch                          | Dynamic Dispatch                       |
+|---------------------|------------------------------------------|----------------------------------------|
+| **Method Resolution** | At compile-time                        | At runtime                             |
+| **Performance**     | Faster due to compile-time resolution    | Slower due to runtime vtable lookup    |
+| **Memory Usage**    | Potentially higher (code bloat)          | Typically lower due to shared vtable   |
+| **Inlining**        | Possible                                 | Not possible                           |
+| **Type Requirement**| Requires knowing types at compile time   | Types can vary, resolved at runtime    |
+| **Flexibility**     | Less flexible, type-specific             | More flexible, allows polymorphism     |
+| **Typical Use Case**| Generic programming, performance-critical| Trait objects, heterogeneous collections |
+| **Code Size**       | Larger due to multiple specialized instances | Smaller, one instance with vtable lookup |
+| **Error Checking**  | Errors caught at compile time            | Some errors may only appear at runtime |
+
+
+```rust
+// Define a trait with a single method
+trait Shape {
+    fn area(&self) -> f64;
+}
+
+// Implement Shape trait for Circle
+struct Circle {
+    radius: f64,
+}
+
+impl Shape for Circle {
+    fn area(&self) -> f64 {
+        3.14159 * self.radius * self.radius
+    }
+}
+
+// Implement Shape trait for Square
+struct Square {
+    side: f64,
+}
+
+impl Shape for Square {
+    fn area(&self) -> f64 {
+        self.side * self.side
+    }
+}
+
+// Function that uses static dispatch (generic function)
+fn print_area_static<T: Shape>(shape: &T) {
+    println!("Static dispatch area: {}", shape.area());
+}
+
+// Function that uses dynamic dispatch (trait object)
+fn print_area_dynamic(shape: &dyn Shape) {
+    println!("Dynamic dispatch area: {}", shape.area());
+}
+
+fn main() {
+    let circle = Circle { radius: 5.0 };
+    let square = Square { side: 3.0 };
+
+    // Static dispatch
+    print_area_static(&circle); // Compile-time determination for Circle
+    print_area_static(&square); // Compile-time determination for Square
+
+    // Dynamic dispatch
+    let shapes: Vec<&dyn Shape> = vec![&circle, &square];
+    for shape in shapes {
+        print_area_dynamic(shape); // Runtime determination for each shape
+    }
+}
+
+```
+
+### State Design Pattern 
+
+The State design pattern is a behavioral design pattern that allows an object to change its behavior when its internal state changes. The object will appear to change its class. In Rust, this pattern is commonly implemented using traits and enums to encapsulate state-specific behavior, allowing a struct to change behavior dynamically based on its current state. This is particularly useful for managing complex state transitions in systems with clear states, such as a finite state machine.
+
+In the State pattern:
+1. State-Specific Behavior: Each state has its own behavior, often implemented as a separate struct or enum variant.
+2. Delegation to State: The context (main struct) delegates behavior to the current state.
+3. State Transitions: The state can transition to another state, updating the context’s current state.
+
+```rust
+// Define a trait for states, with behaviors that change depending on the state
+trait State {
+    fn add_text(&self, text: &str, document: &mut Document);
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+}
+
+// Context struct that changes behavior based on its state
+struct Document {
+    content: String,
+    state: Box<dyn State>, // Current state as a trait object
+}
+
+impl Document {
+    // Create a new Document in the Draft state
+    fn new() -> Document {
+        Document {
+            content: String::new(),
+            state: Box::new(Draft), // Initial state
+        }
+    }
+
+    // Delegate add_text behavior to the current state
+    fn add_text(&mut self, text: &str) {
+        self.state.add_text(text, self);
+    }
+
+    // Transition to Review state
+    fn request_review(&mut self) {
+        // Consume current state and transition to Review
+        self.state = self.state.request_review();
+    }
+
+    // Transition to Approved state (Publish)
+    fn approve(&mut self) {
+        // Consume current state and transition to Published
+        self.state = self.state.approve();
+    }
+
+    // Retrieve content if document is in Published state
+    fn content(&self) -> &str {
+        if self.state.is::<Published>() {
+            &self.content
+        } else {
+            ""
+        }
+    }
+}
+
+// Define each state struct and implement state-specific behaviors
+struct Draft;
+struct Review;
+struct Published;
+
+// Implement the State trait for the Draft state
+impl State for Draft {
+    fn add_text(&self, text: &str, document: &mut Document) {
+        document.content.push_str(text);
+    }
+
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        Box::new(Review) // Transition to Review
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self // Stay in Draft (can't approve a draft directly)
+    }
+}
+
+// Implement the State trait for the Review state
+impl State for Review {
+    fn add_text(&self, _text: &str, _document: &mut Document) {
+        // No-op: can't add text in Review state
+    }
+
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self // Stay in Review
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        Box::new(Published) // Transition to Published
+    }
+}
+
+// Implement the State trait for the Published state
+impl State for Published {
+    fn add_text(&self, _text: &str, _document: &mut Document) {
+        // No-op: can't add text in Published state
+    }
+
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self // Stay in Published
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self // Stay in Published
+    }
+}
+
+fn main() {
+    let mut doc = Document::new();
+
+    // In Draft state, we can add text
+    doc.add_text("This is the first draft.");
+    println!("Content in Draft: {}", doc.content); // Shows content
+
+    // Transition to Review state
+    doc.request_review();
+    doc.add_text(" Additional text."); // No effect in Review state
+    println!("Content in Review: {}", doc.content); // Content unchanged
+
+    // Transition to Published state
+    doc.approve();
+    println!("Content in Published: {}", doc.content()); // Shows final content
+
+    // Attempting to add text after publishing has no effect
+    doc.add_text(" New text.");
+    println!("Content after published: {}", doc.content()); // Unchanged content
+}
+
+```
+
+## Patterns and Matching
+Patterns allow you to match and deconstruct complex data types in a concise and readable way. The primary tool for pattern matching in Rust is the match expression, but patterns can also be used in if let expressions, while let loops, for loops, function parameters, and even variable declarations.
+
+### Match Statement
+A match statement compares a value against a series of patterns and executes the code associated with the first matching pattern.
+
+```rust
+fn main() {
+    let number = 7;
+
+    match number {
+        1 => println!("One"),
+        2 => println!("Two"),
+        3 | 4 | 5 => println!("Three, Four, or Five"), // Multiple patterns with |
+        6..=10 => println!("Between six and ten"),    // Range pattern
+        _ => println!("Some other number"),           // Wildcard pattern
+    }
+}
+```
+
+### Pattern Matching with Enums
+Enums are often used with match because each variant can represent a unique case. 
+
+``` rust
+enum Shape {
+    Circle { radius: f64 },
+    Rectangle { width: f64, height: f64 },
+}
+
+fn area(shape: Shape) -> f64 {
+    match shape {
+        Shape::Circle { radius } => 3.14159 * radius * radius,
+        Shape::Rectangle { width, height } => width * height,
+    }
+}
+
+fn main() {
+    let circle = Shape::Circle { radius: 2.5 };
+    println!("Area: {}", area(circle));
+}
+
+```
+
+### if let and while let Conditional Matching
+Enums are often used with match because each variant can represent a unique case. 
+
+``` rust
+fn main() {
+    let some_value = Some(5);
+
+    // if let for optional pattern matching
+    if let Some(x) = some_value {
+        println!("Found a value: {}", x);
+    } else {
+        println!("Found nothing");
+    }
+
+    // while let for repeated conditional matching
+    let mut stack = vec![1, 2, 3];
+    while let Some(top) = stack.pop() {
+        println!("Popped: {}", top);
+    }
+}
+
+```
+
+
+###  Destructuring in Function Parameters and let Bindings
+Patterns can also be used directly in let bindings and function parameters, allowing you to unpack complex structures when binding variables.
+
+``` rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn print_coordinates(Point { x, y }: Point) {
+    println!("Current location: ({}, {})", x, y);
+}
+
+fn main() {
+    let (x, y) = (1, 2); // Tuple destructuring
+    println!("x: {}, y: {}", x, y);
+
+    let point = (3, 4);
+    let (a, b) = point; // Destructuring to unpack `point`
+    println!("a: {}, b: {}", a, b);
+
+    let point = Point { x: 10, y: 20 };
+    print_coordinates(point);
+}
+
+```
+
+### Pattern Matching with Option and Result
+Pattern guards provide additional conditions to refine matches. Guards use if statements to add an extra condition.
+Nested patterns allow for matching complex data structures, such as enums inside structs or nested tuples.
+
+``` rust
+    fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        Err("Cannot divide by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+    }
+
+    fn main() {
+    let value = Some(3);
+
+    match value {
+        Some(x) => println!("Got: {}", x),
+        None => println!("No value"),
+    }
+
+    let result = divide(10.0, 2.0);
+
+    match result {
+        Ok(value) => println!("Result: {}", value),
+        Err(message) => println!("Error: {}", message),
+    }
+}
+
+```
+
+
+### Advanced Patterns: Guards and Nested Patterns
+@ bindings allow you to bind a value to a variable while still matching against a pattern. This is useful if you need to refer to the entire matched value as well as its parts.
+
+``` rust
+    enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(Color),
+    }
+
+    enum Color {
+        RGB(i32, i32, i32),
+        HSV(i32, i32, i32),
+    }
+    fn main() {
+    let number = Some(4);
+
+    match number {
+        Some(x) if x < 5 => println!("Less than five: {}", x),
+        Some(x) => println!("Greater or equal to five: {}", x),
+        None => println!("No value"),
+    }
+
+        let msg = Message::ChangeColor(Color::RGB(0, 160, 255));
+
+    match msg {
+        Message::ChangeColor(Color::RGB(r, g, b)) => {
+            println!("Change color to RGB: ({}, {}, {})", r, g, b);
+        }
+        Message::ChangeColor(Color::HSV(h, s, v)) => {
+            println!("Change color to HSV: ({}, {}, {})", h, s, v);
+        }
+        _ => println!("Other message"),
+    }
+}
+
+```
+
+### Using @ Bindings
+``` rust
+fn main() {
+    let number = Some(5);
+
+    match number {
+        Some(n @ 1..=5) => println!("Matched a range element: {}", n),
+        Some(n) => println!("Got a value: {}", n),
+        None => println!("No value"),
+    }
+}
+
+```
+
+## Unsafe Rust
+Writing unsafe Rust is an advanced aspect of the Rust programming language that allows developers to perform operations that the Rust compiler cannot guarantee are safe. Unsafe Rust allows you to opt out of Rust's strict safety guarantees, giving you more control over memory and other low-level operations.
+
+This is accomplished through the use of the unsafe keyword, which indicates that you are taking responsibility for upholding safety guarantees that the Rust compiler cannot enforce.
+
+Unsafe Rust can be used for several critical operations:
+1. **Dereferencing Raw Pointers**: Accessing memory directly through raw pointers.
+```rust
+fn main() {
+    let mut value: i32 = 42;
+    let r: *mut i32 = &mut value; // Create a mutable raw pointer
+
+    unsafe {
+        println!("Value before: {}", *r); // Dereference the raw pointer
+        *r = 100; // Modify the value through the raw pointer
+    }
+
+    println!("Original value: {}", value); // Should print 100
+}
+```
+2. **Calling Unsafe Functions**: Invoking functions that are marked as unsafe.
+```rust
+unsafe fn dangerous() {
+    println!("This is an unsafe function!");
+}
+
+fn main() {
+    unsafe {
+        dangerous(); // Call the unsafe function
+    }
+}
+```
+3. **Accessing Unsafe Traits**: Using traits that require unsafe implementations.
+```rust
+unsafe trait MyUnsafeTrait {
+    fn do_something(&self);
+}
+
+struct MyStruct;
+
+unsafe impl MyUnsafeTrait for MyStruct {
+    fn do_something(&self) {
+        println!("Doing something unsafely!");
+    }
+}
+
+fn main() {
+    let my_struct = MyStruct;
+    unsafe {
+        my_struct.do_something(); // Call the unsafe trait method
+    }
+}
+```
+4. **Manipulating Mutable Static Variables**: Working with mutable static variables that are shared across threads.
+```rust
+static mut GLOBAL: i32 = 0;
+
+fn increment() {
+    unsafe {
+        GLOBAL += 1; // Increment the global variable
+    }
+}
+
+fn main() {
+    increment();
+    unsafe {
+        println!("Global value: {}", GLOBAL); // Print the value
+    }
+}
+```
+5. **Using unsafe Blocks**: Enclosing code that performs unsafe operations within an unsafe block.
+```rust
+fn main() {
+    let x = 42;
+    let r = &x as *const i32; // Create a raw pointer
+
+    unsafe {
+        println!("Raw pointer points to: {}", *r); // Dereferencing a raw pointer
+    }
+}
+```
+
+### Extern
+The ```extern``` keyword is used to define an interface for interacting with foreign (non-Rust) code, primarily when working with C libraries or other languages. It allows Rust programs to call functions and use data types defined in other programming languages. Calling external functions requires unsafe blocks, as the Rust compiler cannot guarantee the safety of operations performed through foreign interfaces.
+
+1. **Extern Functions**
+When you want to call functions from an external library, you declare them using the extern keyword.  
+
+```rust
+extern "C" {
+    fn c_function(x: i32) -> i32; // Declare an external C function
+}
+
+fn main() {
+    unsafe {
+        let result = c_function(5); // Call the external function within an unsafe block
+        println!("Result from C function: {}", result);
+    }
+}
+
+```
+You can group multiple external function declarations within an extern block for better organization:
+```rust
+extern "C" {
+    fn c_function_one(x: i32) -> i32;
+    fn c_function_two(y: f64) -> f64;
+}
+```
+2. **FFI (Foreign Function Interface)**
+extern is primarily used in the context of FFI, which allows Rust to call functions and use data types defined in other languages, particularly C.
+```C 
+// c_library.c
+#include <stdio.h>
+
+int add(int a, int b) {
+    return a + b;
+}
+```
+You can call this function from Rust like this:
+```rust
+// main.rs
+#[link(name = "c_library")] // Link with the C library
+extern "C" {
+    fn add(a: i32, b: i32) -> i32; // Declare the C function
+}
+
+fn main() {
+    unsafe {
+        let sum = add(3, 4); // Call the C function
+        println!("Sum: {}", sum); // Prints "Sum: 7"
+    }
+}
+
+```
+3. **Extern Crates and Extern Types**
+The extern keyword is also used to declare external crates in Rust, which are libraries published on crates.io.
+```rust
+extern crate serde; // Declare an external crate
+
+use serde::{Serialize, Deserialize}; // Use items from the serde crate
+
+fn main() {
+    // Your code that uses the serde library
+}
+```
+
+You can also declare types that are defined externally, typically used in FFI contexts.
+```rust
+extern {
+    type ExternalType; // Declare an external type
+}
+```
