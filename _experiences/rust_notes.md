@@ -3134,7 +3134,7 @@ fn main() {
 
 ```
 
-You can group multiple external function declarations within an extern block for better organization:
+    You can group multiple external function declarations within an extern block for better organization:
 
 ```rust
 extern "C" {
@@ -3142,16 +3142,17 @@ extern "C" {
     fn c_function_two(y: f64) -> f64;
 }
 ```
+
 2. **FFI (Foreign Function Interface)**
     extern is primarily used in the context of FFI, which allows Rust to call functions and use data types defined in other languages, particularly C.
 
-```C 
-// c_library.c
-#include <stdio.h>
+```C
+#include <stdio.h> // c_library.c
 
 int add(int a, int b) {
     return a + b;
 }
+
 ```
 
 You can call this function from Rust like this:
