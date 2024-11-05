@@ -3192,3 +3192,529 @@ extern {
     type ExternalType; // Declare an external type
 }
 ```
+
+## Advanced Traits
+### Associated types
+Associated types let you define a placeholder type within a trait. This is useful when a trait needs to refer to an unknown type that can vary depending on the implementation.
+
+```rust
+    trait Iterator {
+        type Item;
+        fn next(&mut self) -> Option<Self::Item>;
+    }
+```
+
+### Default implementations
+Traits can include default implementations for some or all methods, which are used unless the type implementing the trait overrides them. This is useful when you want most types to use a standard implementation but allow customization.
+
+```rust
+    trait Greet {
+        fn say_hello(&self) {
+            println!("Hello, world!");
+        }
+    }
+    struct Person;
+
+    impl Greet for Person {} // Uses default implementation
+
+    let person = Person;
+    person.say_hello(); // Output: "Hello, world!"
+
+```
+
+### Supertraits
+Supertraits allow you to define trait dependencies. If a trait depends on another trait, the implementing type must implement the supertrait first. Creates a hierarchy of traits, allowing more complex behaviors. Enables reuse of implementations and constraints across traits.
+
+```rust
+    trait Displayable: std::fmt::Display {
+        fn display(&self) {
+            println!("{}", self);
+        }
+    }
+
+```
+
+### Operator overloading with traits
+Rust’s standard library defines traits that overload operators. For example, the Add trait allows + operator overloading. This is done by implementing the std::ops traits, which specify how to handle the operators.
+
+```rust
+    use std::ops::Add;
+
+    struct Point {
+        x: i32,
+        y: i32,
+    }
+
+    impl Add for Point {
+        type Output = Point;
+
+        fn add(self, other: Point) -> Point {
+            Point {
+                x: self.x + other.x,
+                y: self.y + other.y,
+            }
+        }
+    }
+
+```
+
+### Marker Traits
+Marker traits are traits without any methods, used to signal or mark a type as having a particular property or characteristic. Rust’s Send and Sync traits are examples, marking types that are safe to transfer or access across threads. Marker traits allow for defining certain characteristics without implementing behavior. Helps enforce type safety across certain contexts, such as thread safety with Send and Sync.
+
+```rust
+    trait MyMarkerTrait {}
+
+    // Implement the marker trait for specific types
+    struct MyStruct;
+    impl MyMarkerTrait for MyStruct {}
+
+    // Now MyStruct can be identified by MyMarkerTrait
+```
+
+## Advanced Types
+### Type Aliases
+Type aliases allow you to create alternative names for types, making complex types more readable and reusable. Aliases are created using the type keyword.
+
+```rust
+    type Kilometers = i32;
+    let distance: Kilometers = 5;
+
+    type Result<T> = std::result::Result<T, std::io::Error>;
+
+    fn read_file(path: &str) -> Result<String> {
+        std::fs::read_to_string(path)
+    }
+```
+
+### Newtype Pattern
+The Newtype Pattern involves creating a wrapper around an existing type. This can be useful for distinguishing between different uses of the same underlying type or for implementing additional traits.
+
+```rust
+    struct Meters(i32);
+
+    fn print_distance(distance: Meters) {
+        println!("Distance: {} meters", distance.0);
+    }
+
+```
+
+### Phantom Types and Phantom Data
+Phantom types are used when a generic type parameter is needed for type checking but is not actually stored in the struct. PhantomData is a marker type that tells the Rust compiler that the struct conceptually owns a value of a certain type without actually storing it. Useful for zero-cost type markers. Ensures type safety when you need generic constraints without storing data.
+
+```rust
+    use std::marker::PhantomData;
+
+    struct MyStruct<T> {
+        _marker: PhantomData<T>,
+    }
+
+    impl<T> MyStruct<T> {
+        fn new() -> Self {
+            MyStruct { _marker: PhantomData }
+        }
+    }
+```
+
+### Never Type (!)
+The never type, !, is used for functions or expressions that never return (such as a loop or error). It’s commonly used with functions that panic or for exhaustive matching with match Provides compile-time guarantees that certain code paths don’t return. Useful in cases where functions are designed to halt program execution.
+
+```rust
+    fn process_data(data: Option<&str>) {
+        match data {
+            Some(value) => println!("Data: {}", value),
+            None => panic!("No data available!"), // `panic!` returns `!`
+        }
+    }
+```
+
+### Dynamic Types
+The dyn keyword is used to define trait objects, allowing for dynamic dispatch. This is useful when the exact type isn’t known at compile time but can be handled via a common trait interface. Allows for polymorphism by enabling a single interface to operate on different types at runtime. Useful for heterogeneous collections of types implementing the same trait.
+
+```rust
+    trait Animal {
+        fn make_sound(&self);
+    }
+
+    struct Dog;
+    impl Animal for Dog {
+        fn make_sound(&self) {
+            println!("Woof!");
+        }
+    }
+
+    fn main() {
+        let my_pet: Box<dyn Animal> = Box::new(Dog);
+        my_pet.make_sound();
+    }
+
+```
+
+## Advanced Functions and Closures
+###  Closures with Type Inference and Capturing Environment
+Rust closures are anonymous functions that can capture variables from their surrounding environment. Rust supports three kinds of closures based on how they capture variables:
+- By Borrowing (Fn): Borrows the variable immutably.
+- By Mutable Borrowing (FnMut): Borrows the variable mutably.
+- By Moving (FnOnce): Takes ownership of the variable.
+
+```rust
+    let name = String::from("Alice");
+
+    let greet = || println!("Hello, {}", name); // Captures `name` by immutable borrow (Fn)
+    greet(); // Output: "Hello, Alice"
+```
+
+### Returning Closures
+Closures can also be returned from functions, but because closures are anonymous types, they require the impl Trait syntax or boxed trait objects (Box<dyn Fn()>).
+
+```rust
+    fn create_closure() -> impl Fn(i32) -> i32 {
+        |x| x + 1
+    }
+
+    let closure = create_closure();
+    println!("Result: {}", closure(5)); // Output: "Result: 6"
+
+    fn create_boxed_closure() -> Box<dyn Fn(i32) -> i32> {
+    Box::new(|x| x + 1)                 // Alternatively, using Box<dyn Fn()>
+}
+
+```
+
+### Function pointers
+Rust allows you to use function pointers with the fn keyword, which refers to actual function items rather than closures. Function pointers are more restricted than closures since they can’t capture environment variables.
+
+```rust
+    fn add_one(x: i32) -> i32 {
+        x + 1
+    }
+
+    fn execute_function(func: fn(i32) -> i32, value: i32) -> i32 {
+        func(value)
+    }
+
+    let result = execute_function(add_one, 5);
+    println!("Result: {}", result); // Output: "Result: 6"
+
+```
+
+###  Closure Traits
+Rust’s closure traits (Fn, FnMut, and FnOnce) define how closures can interact with their environment:
+
+- Fn: Immutable closures that can be called multiple times without modifying the environment.
+- FnMut: Mutable closures that can be called multiple times but may modify the environment.
+- FnOnce: Closures that can only be called once, as they consume their environment.
+
+```rust
+    let mut count = 0;
+
+    // Fn closure: captures by reference
+    let incr_fn = || println!("Count: {}", count);
+    incr_fn();
+
+    // FnMut closure: captures by mutable reference
+    let mut incr_fnmut = || count += 1;
+    incr_fnmut();
+
+    // FnOnce closure: moves count into the closure
+    let incr_fnonce = move || println!("Moved Count: {}", count);
+    incr_fnonce();
+```
+
+## Declarative macros
+In Rust, declarative macros (often called macro_rules! macros) are a powerful feature that allows you to write code that generates other code. They are a form of metaprogramming in which you define patterns and tell Rust how to expand them into more complex code. 
+
+A declarative macro in Rust is defined using the ```macro_rules!``` keyword. It consists of a set of patterns, each of which specifies how to match input tokens and transform them into output code.
+
+```rust
+    macro_rules! macro_name {
+        (pattern) => {
+            code_to_expand;
+        };
+    }
+```
+
+A macro can have multiple patterns, allowing it to match different forms of input. For example, you might want a macro to take different numbers or types of arguments.
+```rust
+    macro_rules! my_macro {
+        () => {
+            println!("No arguments provided");
+        };
+        ( $arg:expr ) => {
+            println!("Argument: {}", $arg);
+        };
+        ( $arg1:expr, $arg2:expr ) => {
+            println!("Two arguments: {} and {}", $arg1, $arg2);
+        };
+    }
+```
+The core of declarative macros is pattern matching. Each pattern in a macro consists of tokens that represent different kinds of Rust code. Macros match these tokens and substitute them as specified in the expansion code.
+- ```expr```: Matches any expression.
+- ```ident```: Matches an identifier (variable or function name).
+- ```ty```: Matches a type.
+- ```pat```: Matches a pattern (useful in match statements).
+- ```block```: Matches a block of code (anything in curly braces {}).
+- ```item```: Matches any item (function, struct, etc.).
+
+Declarative macros can match repeating patterns using *, +, or ?:
+- ```*```: Matches zero or more repetitions.
+- ```+```: Matches one or more repetitions.
+- ```?```: Matches zero or one repetition.
+
+```rust
+    macro_rules! sum {
+        ( $( $x:expr ),* ) => {
+            {
+                let mut sum = 0;
+                $(
+                    sum += $x;
+                )*
+                sum
+            }
+        };
+    }
+
+    fn main() {
+        let result = sum!(1, 2, 3, 4, 5);
+        println!("Sum: {}", result); // Output: "Sum: 15"
+    }
+```
+
+In macros, you use ```$``` to specify capture groups. Capture groups allow you to capture values from patterns and use them in the macro’s expansion code. Macros in Rust can call themselves recursively, enabling you to implement more complex logic.
+
+```rust
+    macro_rules! nested_vec {
+        ( $( $x:expr ),* ) => {
+            {
+                let mut vec = Vec::new();
+                $(
+                    vec.push(vec![$x]);
+                )*
+                vec
+            }
+        };
+    }
+
+    fn main() {
+        let nested = nested_vec!(1, 2, 3);
+        println!("{:?}", nested); // Output: [[1], [2], [3]]
+    }
+```
+
+You can create flexible macros by using conditional matching. This lets macros handle different inputs in different ways, similar to overloading functions in other languages.
+
+```rust
+    macro_rules! print_type {
+        ( $val:expr ) => {
+            println!("Expression: {:?}", $val);
+        };
+        ( $name:ident: $ty:ty = $val:expr ) => {
+            let $name: $ty = $val;
+            println!("{}: {:?} (Type: {})", stringify!($name), $name, stringify!($ty));
+        };
+    }
+
+    fn main() {
+        print_type!(10);                  // Outputs: Expression: 10
+        print_type!(age: u32 = 30); // Outputs: age: 30 (Type: u32)
+    }
+```
+
+Declarative macros in Rust are powerful enough to build mini-languages, known as **domain-specific languages (DSLs)**. DSLs provide a specialized syntax that simplifies coding in particular domains.
+
+For example, you can create a macro that mimics JSON structure:
+```rust
+    macro_rules! json {
+    ( $( $key:expr => $value:expr ),* ) => {
+        {
+            let mut map = std::collections::HashMap::new();
+            $(
+                map.insert($key, $value);
+            )*
+            map
+        }
+    };
+    }
+
+    fn main() {
+    let data = json! {
+        "name" => "John",
+        "age" => 30,
+        "city" => "New York"
+    };
+
+    println!("{:?}", data);
+    }
+```
+
+## Procedural Macros
+Procedural macros are Rust functions that take some code as input, transform it, and produce new code. They differ from declarative macros ```macro_rules!``` in that they provide more control and are written using Rust code to manipulate Rust syntax trees (AST). Procedural macros are defined in a separate crate called a proc-macro crate, which enables them to be used across projects.
+
+Types:
+- ```Custom #[derive] Macros```: Automatically generate implementations for traits.
+-  ```Attribute Macros```: Customize behavior or add new functionality using attributes.
+- ```Function-like Macros```: Create macros that behave like functions but provide custom syntax.
+
+### Setting up a Procedural Macro Crate
+You need to create a dedicated crate of type proc-macro
+
+```shell
+    cargo new my_proc_macro --lib
+```
+
+Edit Cargo.toml to declare the crate as a procedural macro crate.
+Procedural macros leverage the proc_macro library, which provides the API for working with Rust’s syntax trees. Key components include:
+
+- ```TokenStream```: Represents the stream of tokens (code) passed to the macro. The input and output of procedural macros are TokenStream objects.
+
+- ```quote``` and ```syn``` (from external crates): Often used to parse and generate Rust code in procedural macros, as they simplify syntax manipulation.
+    - ```syn```: Parses Rust code into structured representations (syntax trees).
+    - ```quote```: Turns Rust code back into a TokenStream using templating syntax, making it easier to inject variables and create Rust code templates.
+
+```toml
+    [lib]
+    proc-macro = true
+
+    [dependencies]
+    syn = "2.0"
+    quote = "1.0"
+```
+
+### Custom Macro
+A custom derive macro generates implementations for a trait when the ```#[derive]``` attribute is used. Let’s look at an example where we derive a trait called HelloMacro that adds a method hello() to a struct.
+
+```rust
+    // In the procedural macro crate
+
+    use proc_macro::TokenStream;
+    use quote::quote;
+    use syn;
+
+    #[proc_macro_derive(HelloMacro)]
+    pub fn hello_macro_derive(input: TokenStream) -> TokenStream {
+        // Parse the input tokens into a syntax tree
+        let ast = syn::parse(input).unwrap();
+        // Generate the code for the implementation
+        impl_hello_macro(&ast)
+    }
+
+    fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
+        let name = &ast.ident;
+        let gen = quote! { //Generates code using the quote crate’s templating syntax.
+            impl HelloMacro for #name {
+                fn hello() {
+                    println!("Hello, I am a {}!", stringify!(#name)); //the identifier (e.g., MyStruct) in the generated code.
+                }
+            }
+        };
+        gen.into()
+    }
+
+```
+
+In the main crate, we use this procedural macro:
+
+```rust
+    // Import the procedural macro
+    use my_proc_macro::HelloMacro;
+
+    #[derive(HelloMacro)]
+    struct MyStruct;
+
+    fn main() {
+        MyStruct::hello(); // Prints: "Hello, I am a MyStruct!"
+    }
+```
+
+### Attribute Macros
+Attribute macros define custom behavior with ```#[my_attribute]``` syntax, enabling more flexibility for function, struct, or other code modification.
+
+Example: Implementing an attribute macro that logs function calls:
+```rust
+    use proc_macro::TokenStream;
+    use quote::quote;
+    use syn;
+
+    #[proc_macro_attribute]
+    pub fn log_execution(_attr: TokenStream, item: TokenStream) -> TokenStream {
+        // Parse the input function
+        let input = syn::parse_macro_input!(item as syn::ItemFn);
+        let fn_name = &input.sig.ident; //Retrieves the function’s name.
+        let fn_block = &input.block; //Captures the function’s body.
+        let gen = quote! {
+            fn #fn_name() {
+                println!("Executing function: {}", stringify!(#fn_name));
+                #fn_block
+            }
+        };
+        gen.into()
+    }
+```
+
+Using the attribute macro in the main crate:
+
+```rust
+    use my_proc_macro::log_execution;
+
+    #[log_execution]
+    fn my_function() {
+        println!("Inside my_function.");
+    }
+
+    fn main() {
+        my_function();
+        // Output:
+        // Executing function: my_function
+        // Inside my_function.
+    }
+
+```
+
+### Function-like Macros
+Function-like macros provide syntax similar to functions ```(my_macro!(...))```, allowing you to define custom syntax for complex operations.
+
+Example: A macro that builds a HashMap from key-value pairs:
+```rust
+    use proc_macro::TokenStream;
+    use quote::quote;
+    use syn::{parse_macro_input, Expr, Token};
+    use syn::punctuated::Punctuated;
+
+    #[proc_macro]
+    pub fn hashmap(input: TokenStream) -> TokenStream {
+        let pairs = parse_macro_input!(input as Punctuated<Expr, Token![,]>); //Uses Punctuated to separate each key-value pair.
+        let mut entries = Vec::new();
+
+        for pair in pairs {
+            let key_value: Punctuated<Expr, Token![=>]> = syn::parse2(pair.into_token_stream()).unwrap();
+            let key = &key_value[0];
+            let value = &key_value[1];
+            entries.push(quote! { map.insert(#key, #value); }); //The macro expands to map.insert(key, value); statements within a HashMap initializer.
+        }
+
+        let expanded = quote! {
+            {
+                let mut map = std::collections::HashMap::new();
+                #(#entries)*
+                map
+            }
+        };
+
+        expanded.into()
+    }
+```
+
+Using the function-like macro in the main crate:
+
+
+```rust
+    use my_proc_macro::hashmap;
+    use std::collections::HashMap;
+
+    fn main() {
+        let my_map: HashMap<_, _> = hashmap! {
+            "key1" => "value1",
+            "key2" => "value2",
+        };
+        println!("{:?}", my_map);
+    }
+```
