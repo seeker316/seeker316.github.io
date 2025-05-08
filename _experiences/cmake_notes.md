@@ -11,7 +11,7 @@ Cmake is a build automation tool, and it is platform independent
 
 cmake relies on a top level file CMakelists.txt
 To run cmake u have to tell it where the source and the build folder is
-```terminal
+```shell
   cmake [options] <path-to-source>
   cmake [options] <path-to-existing-build>
   cmake [options] -S <path-to-source> -B <path-to-build>
@@ -41,7 +41,7 @@ This only happens if those properties are marked INTERFACE or PUBLIC.
 
 - create a build directory, and navigate to it
 - run **cmake** to configure the project  
-```terminal
+```shell
  cmake [<options>] <path-to-source>
               Uses  the  current working directory as the build tree, and
               <path-to-source> as the source tree.   The  specified  path
@@ -55,7 +55,7 @@ This only happens if those properties are marked INTERFACE or PUBLIC.
 ```
 
 - call **build** to compile and link the project in that directory.
-```terminal
+```shell
 cmake --build
 ```
 
@@ -291,7 +291,7 @@ install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
 
 ```
 To run the install steo use the ```--install``` option of the cmake command, in older versions, below cmake 3.15 one has to used ```make install``` 
-```terminal
+```shell
 cmake --install .
 ```
 
@@ -319,7 +319,7 @@ set_tests_properties(<tests>...
                      [<prop2> <value2>]...)
 e.g
 set_tests_properties(StandardUse PROPERTIES PASS_REGULAR_EXPRESSION "4 is 2")
-//PASS_REGULAR_EXPRESSION Property : A regular expression (or plain string) that must appear in the test’s standard output for it to be considered a success.
+# PASS_REGULAR_EXPRESSION Property : A regular expression (or plain string) that must appear in the test’s standard output for it to be considered a success.
 ```
 - **function** : Start recording a function for later invocation as a command. Defines a function with a name that takes arguments named arg1, ... The commands in the function definition are recorded; they are not executed until the function is invoked. Per legacy, the endfunction() command admits an optional name argument. If used, it must be a verbatim repeat of the argument of the opening function command.
 ```cmake
@@ -332,7 +332,7 @@ add_test(NAME Comps${arg} COMMAND ${target} ${arg})
 set_tests_properties(Comps${arg} PROPERTIES PASS_REGULAR_EXPRESSION ${result})
 endfunction()
 
-//Function Invocation
+#Function Invocation
 do_test(Tutorial 4 "4 is 2")
 ```
 
@@ -357,7 +357,7 @@ set(CTEST_DROP_LOCATION "/submit.php?project=CMakeTutorial")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ```
 To create a simple test dashboard, run the cmake executable or the cmake-gui to configure the project but do not build it yet. Instead, navigate to the build directory and run:
-```terminal
+```shell
 ctest [-VV] -D Experimental
 ```
 
@@ -486,15 +486,15 @@ We start by including InstallRequiredSystemLibraries. This module will include a
 Finally we include the CPack module which will use these variables and some other properties of the current system to setup an installer.
 
 The next step is to build the project in the usual manner and then run the cpack executable. To build a binary distribution, from the binary directory run:
-```terminal
+```shell
   cpack
 ```
 To specify the binary generator, use the -G option. For multi-config builds, use -C to specify the configuration. An archive generator like ZIP creates a compressed archive of all installed files.
-```terminal
+```shell
   cpack -G ZIP -C Debug
 ```
 To create an archive of the full source tree you would type:
-```terminal
+```shell
   cpack --config CPackSourceConfig.cmake
 ```
 
@@ -518,7 +518,7 @@ update the library to use dll exports. When building a shared library (DLL) on W
 #  else
 #    define DECLSPEC __declspec(dllimport)
 #  endif
-#else // non windows
+#else /*non windows*/
 #  define DECLSPEC
 #endif
 
@@ -649,14 +649,14 @@ set_property(TARGET MathFunctions PROPERTY VERSION "1.0.0")
 set_property(TARGET MathFunctions PROPERTY SOVERSION "1")
 ```
 create debug and release subdirectories. The layout will look like
-```terminal
+```shell
 - ProjSourceDir
    - debug
    - release
 
 ```
 For setup we can use CMAKE_BUILD_TYPE to set the configuration type
-```terminal
+```shell
 cd debug
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
@@ -675,6 +675,6 @@ set(CPACK_INSTALL_CMAKE_PROJECTS
     )
 ```
 From the Project Source directory, run cpack specifying our custom configuration file with the config option
-```terminal
+```shell
 cpack --config MultiCPackConfig.cmake
 ```
