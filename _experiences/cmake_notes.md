@@ -167,6 +167,24 @@ e.g.
 target_include_directories(Tutorial PUBLIC "${PROJECT_BINARY_DIR}")
 ```
 
+**pkg-config** is used to locate libraries and their flags.
+**pkg_check_modules**, uses pkg-config to find for required libraries
+```
+e.g.
+pkg_check_modules(CAIRO REQUIRED cairo)
+pkg_check_modules(X11 REQUIRED x11)
+
+```
+here "CAIRO" is the prefix you define for the variables that pkg-config will return.
+CMake automatically defines several variables prefixed with CAIRO_ as given below:
+
+| Variable               | Description                                                |
+|------------------------|------------------------------------------------------------|
+| `CAIRO_INCLUDE_DIRS`   | List of include paths (e.g., `/usr/include/cairo`)         |
+| `CAIRO_LIBRARY_DIRS`   | List of library paths (e.g., `/usr/lib/x86_64-linux-gnu`)  |
+| `CAIRO_LIBRARIES`      | List of actual library names to link with (e.g., `cairo`)  |
+| `CAIRO_CFLAGS_OTHER`   | Extra compiler flags required by the Cairo package         |
+
 
 **option** Provide a boolean option (a variable) that the user can optionally select and can change while configuring their cmake build. 
 
