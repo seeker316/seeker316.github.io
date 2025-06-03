@@ -36,7 +36,7 @@ With these tasks stage 1 was concluded and only 30 teams were shortlisted from t
 
 In Stage 2, the hardware setup included a Raspberry Pi 3B paired with an OV5647 camera, a card reader with an SD card, and an AlphaBot2 platform by Waveshare Electronics, powered by Li-ion batteries.
 
-![alphabot2](/img/bessie/alphabot2.jpeg)
+![alphabot2](/img/bessie/alphabot2a.png)
 
 We began by printing the arena on a flex sheet. In the subsequent tasks, we assembled the robot, installed the necessary software, and performed basic maneuvers, such as moving forward, reversing, and rotating.
 
