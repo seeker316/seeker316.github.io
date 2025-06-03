@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Laboratory 232 - Bessie
-subtitle: LAB 232 blog I : Building Bessie --theRoadbot. 
+subtitle: LAB 232 blog I - Building Bessie, the Roadbot. 
 header-img: img/bessie/bessie_blog_cover2.jpeg
 ---
 
