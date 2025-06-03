@@ -30,13 +30,13 @@ Our theme had 6 tasks split into 2 stages. Stage 1 focused on algorithm developm
 -  *Task 2B*: Implement an algorithm to find the shortest path between two points on a grid map.
   Example : For the given grid, the shortest path from cell 9 to cell 2 is:  9 → 6 → 5 → 2.
 
-![map grid](/img/bessie/task2b.png)
+![map grid](/img/bessie/task2b.jpeg)
 
 With these tasks stage 1 was concluded and only 30 teams were shortlisted from the total of 376 teams.
 
 In Stage 2, the hardware setup included a Raspberry Pi 3B paired with an OV5647 camera, a card reader with an SD card, and an AlphaBot2 platform by Waveshare Electronics, powered by Li-ion batteries.
 
-![alphabot2](/img/bessie/alphabot2.png)
+![alphabot2](/img/bessie/alphabot2.jpeg)
 
 We began by printing the arena on a flex sheet. In the subsequent tasks, we assembled the robot, installed the necessary software, and performed basic maneuvers, such as moving forward, reversing, and rotating.
 
