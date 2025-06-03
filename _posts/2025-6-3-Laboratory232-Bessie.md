@@ -2,7 +2,7 @@
 layout: post
 title: Laboratory 232 - Bessie
 subtitle: LAB 232 blog I - Building Bessie, the Roadbot. 
-header-img: img/bessie/bessie_blog_cover2.jpeg
+header-img: img/bessie/bessie_blog_cover.jpeg
 ---
 
 It was in my second year of engineering, I found out we had this subject called the "mini-project". In this, we were required to form teams and work on a project throughout the semester. As the whole class scrambled to find good partners, I ended up with a group of individuals—[Abhinav](abhinav.shetti@gmail.com), [Dhiraj](dhirajmehta2323@gmail.com), and [Nandini](bhagatnandini07@gmail.com)—who shared the same kind of curiosity and way of thinking. People who appreciated the effort it took to get things going and were always ready to dive in. I don’t buy into destiny, but if it were real, being on this team was definitely meant to happen. I can’t imagine engineering without them—never in this life or any other. 
